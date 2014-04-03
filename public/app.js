@@ -49,7 +49,7 @@ app.service('SearchService', function($http){
   this.searchMe = function(address, time){
     console.log("GET /results from server, address:", address, "time:", time);
     return $http({
-      url: "/results", 
+      url: "localhost:3050/results", 
       method: "GET",
       params: {address: address, time: time}
     }).then(function(response){
