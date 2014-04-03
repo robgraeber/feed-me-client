@@ -1,6 +1,6 @@
 feed-me-client
 ==============
 
-Frontend server - Basically Express + Angular
+Frontend server - Express + Angular
 
 To use first: npm install + bower install
