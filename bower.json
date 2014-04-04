@@ -1,20 +1,19 @@
 {
-  "name": "Food For The People",
-  "version": "0.8.0",
+  "name": "feed-me-client",
+  "version": "0.0.0",
+  "homepage": "https://github.com/fcolas6013/feed-me-client",
   "authors": [
-    "Rob Graeber <bgraeber@gmail.com>"
+    "Fabrice Colas <pub@grano-salis.net>"
   ],
-  "description": "Meetup Free Food Searcher",
   "license": "MIT",
   "private": true,
+  "directory":"public/vendor",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
+    "public/bower_components",
     "test",
     "tests"
-  ],
-  "dependencies": {
-    "underscore": "~1.6.0"
-  }
+  ]
 }
