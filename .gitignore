@@ -2,5 +2,6 @@
 /node_modules
 /public/bower_components
 /public/vendor
+/server.log
 azure.err
 setup-env.sh
