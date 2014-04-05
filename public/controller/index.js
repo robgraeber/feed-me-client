@@ -1,6 +1,9 @@
-app.controller('HomeController',function($scope, SearchService, $location){
-  $scope.times = SearchService.times;
-  var currentTime = (new Date()).getTime();
+app.controller('HomeController', 
+    function($scope, SearchService, ApiService, $location){
+    $scope.times = SearchService.times;
+    //ApiService($scope.address, function(data){
+    //  $scope.feedMeApiData = data;
+    // }
 });
 
 //  // SETS DEFAULT SELECT MENU TIME TO CURRENT TIME

@@ -10,9 +10,9 @@ var today   = (new Date()).toISOString().replace(/T/, ' ').replace(/\..+/,'');
 var dstatic = path.join(__dirname, 'public');
 var ficon   = path.join(__dirname,'public/assets/favicon.ico');
 var flogname= path.join(__dirname,'server.log');
+var dviews  = path.join(__dirname, 'views');
 var flog    = fs.createWriteStream(flogname, {flags: 'a'}); 
 
-server.listen(env.port);
 
 // BANNER
 console.log('---------------------------------------------------------');
@@ -21,12 +21,14 @@ console.log('---------------------------------------------------------');
 console.log('| Listen  |', env.feuri ,'                                  |');
 console.log('| Port    |', env.feport,'                                       |');
 console.log('| Statics |', dstatic   ,'    |');
+console.log('| Views   |', dviews, '     |');
 console.log('| Logging |', flogname  ,'|');
 console.log('---------------------------------------------------------');
 
 // CONFIG: SERVER
+server.listen(env.feport);
 server.set('port' , env.feport);
-server.set('views', path.join(__dirname, 'views')); // set path to views
+server.set('views', dviews);                        // set path to views
 server.set('view engine', 'ejs');                   // set view engine to ejs
 server.use(express.logger({'stream': flog }));      // set up logger
 server.use(partials());                             // load partials' middleware
@@ -43,5 +45,5 @@ if(env.env === 'development') server.use(express.errorHandler());
 
 // ROUTING 
 server.get('/', function(req, res){
-  res.render('index.ejs', {title:'title' }); // .render(view , [options ,] callback)
+  res.render('index.ejs', {} ); // .render(view , [options ,] callback)
 });
