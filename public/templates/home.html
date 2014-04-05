@@ -1,18 +1,32 @@
-<div class="mainHome">
-  <div class="outer">
-    <div class="inner">
-      <a href="#" class="logoTextBig">
-        <b>Feed Me!</b>
-      </a>
-      <form ng-submit="submit()">
-        <div class="searchBox">
-          <input class="searchText" ng-model="address" type="text" name="address" placeholder="Nearest Address or Zip">
-          <select class="searchSelect" ng-model="time" ng-options="t.text for t in times">
-            <option value="">-- Time --</option>
-          </select>
-        </div>
-        <input class="searchBtn searchBtnAdjust" type="submit" value="Submit">
-      </form>
-    </div>
-  </div>
-</div>
+<h1>FEED ME</h1>
+
+<h3>address:</h3>
+  <input 
+    class="searchText" 
+    ng-model="address" 
+    name="address" 
+    placeholder="Nearest Address or Zip">
+
+<h3>time:</h3>
+<select 
+  class="searchSelect" 
+  ng-model="time"
+  name='time'
+  ng-options="obj.value as obj.text for obj in times">
+</select>
+
+<h3>submit:</h3>
+<input 
+  class="searchBtn searchBtnAdjust" 
+  type="submit" 
+  value="Submit" 
+  ng-submit="submit()">
+
+<h2>ADDRESS</h2>
+<pre>{{ address }}</pre>
+
+<h2>TIME</h2>
+<pre>{{ time }}</pre>
+
+<h2>SUBMIT</h2>
+<pre>{{ submit }}</pre>
