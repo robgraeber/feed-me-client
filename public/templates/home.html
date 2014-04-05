@@ -1,32 +1,69 @@
-<h1>FEED ME</h1>
+<h1>Feeeeeed meeeee</h1>
 
-<h3>address:</h3>
   <input 
     class="searchText" 
     ng-model="address" 
     name="address" 
-    placeholder="Nearest Address or Zip">
+    placeholder="Nearest Address or Zip"> <span class='glyphicon glyphicon-search'>
+<pre>{{ address }}</pre>
 
-<h3>time:</h3>
 <select 
   class="searchSelect" 
   ng-model="time"
   name='time'
   ng-options="obj.value as obj.text for obj in times">
 </select>
-
-<h3>submit:</h3>
-<input 
-  class="searchBtn searchBtnAdjust" 
-  type="submit" 
-  value="Submit" 
-  ng-submit="submit()">
-
-<h2>ADDRESS</h2>
-<pre>{{ address }}</pre>
-
-<h2>TIME</h2>
 <pre>{{ time }}</pre>
 
-<h2>SUBMIT</h2>
-<pre>{{ submit }}</pre>
+<input
+  class="searchRadius" 
+  ng-model="radius"
+  name='radius' 
+  placeholder='Radius in miles'/>
+<pre>{{ radius }}</pre>
+
+
+<div class='block' ng-repeat="event in events | filter:distanceLessThan">
+  <!-- TITLE-BLOCK -->
+  <div class='row'>        <!-- begin         -->
+    <div class='col-md-1'> <!-- left          -->
+      <span class="glyphicon glyphicon-calendar" />
+    </div>
+    <div class='col-md-11'><!-- middle        --> 
+      <b>{{ event.name }}</b>
+    </div>                 <!-- end           -->
+  </div>
+
+  <!-- CONTENT-BLOCK -->
+  <div class='row'>        <!-- begin         -->
+    <div class='col-md-1'> <!-- left          -->
+      <!-- MAP FEE TO A SCALE OF {,$,$$,$$$} NG-REPEAT-->
+      <span class='glyphicon glyphicon-usd'> {{ event.fee }}
+      {{ event.duration}}
+      <span class='glyphicon glyphicon-time'>
+      {{moment(event.time).format("dddd, MMMM Do YYYY")}}
+      {{ event.distance}} miles
+      {{ event.foodProvided}}
+    </div>
+    <div class='col-md-7'> <!-- middle        --> 
+      <p>{{ event.description}}</p>
+    </div>
+    <div class='col-md-4'> <!-- right         -->
+      <address>
+        <strong>{{ event.venue.name }}</strong><br/>
+        {{ event.venue.address.address1 }}<br/>
+        {{ event.venue.address.city }}<br/>
+        <abbr title="Phone">P:</abbr>
+      </address>
+    </div>                 <!-- end-content   -->
+  </div>
+
+  <!-- FOOTER-BLOCK -->
+  <div class='row'>        <!-- begin         -->
+    <div class='col-md-1'> <!-- left          -->
+    </div>
+    <div class='col-md-11'><!-- middle        --> 
+      <a class="glyphicon glyphicon-link" href="{{ event.url}}" />
+    </div>
+  </div>                   <!-- end           -->
+</div>

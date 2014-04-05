@@ -1,25 +1,14 @@
 app.controller('HomeController', 
-    function($scope, SearchService, ApiService, $location){
-    $scope.times = SearchService.times;
-    //ApiService($scope.address, function(data){
-    //  $scope.feedMeApiData = data;
-    // }
+    function($scope, $http, SearchService, ApiService, $location){
+    $scope.radius = 5;
+    $scope.map = {
+      center: { latitude: 45, longitude: -73 },
+      zoom: 8
+    };
+    $scope.distanceLessThan = function(event){
+      return event.distance < $scope.radius;
+    }
+    ApiService.get('').then(function(res){ 
+      $scope.events= res.data; 
+      });
 });
-
-//  // SETS DEFAULT SELECT MENU TIME TO CURRENT TIME
-//  for(var i = $scope.times.length-1; 0 <= i ; i--){
-//    if(currentTime > $scope.times[i].time){
-//      $scope.time = $scope.times[i];
-//      break;
-//    }
-//  }
-//
-//  // PASS QUERY PARAMETERS AND REDIRECT TO SEARCH ROUTE
-//  $scope.submit = function(){
-//    console.log("Params:", $scope.time);
-//    $location.path("search");
-//    $location.search("a", $scope.address);
-//    if(!!$scope.time.time){
-//      $location.search("t", $scope.time.time+"");
-//    }
-//  };
