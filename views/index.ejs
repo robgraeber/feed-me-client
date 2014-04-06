@@ -10,7 +10,7 @@
   </head>
   <body ng-app='feed-me'>
 
-  <div class="main" ng-view></div>
+  <div class="container" ng-view></div>
 
   <!-- REQUIRED LIBRARIES -->
   <!-- JQUERY: FOR BOOTSTRAP'S JS-PLUGINS -->
@@ -18,12 +18,16 @@
 
   <!-- BOOTSTRAP.JS -->
   <script src="/vendor/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/vendor/bootstrap/js/button.js"></script>
 
   <!-- VENDOR LIBS-->
+  <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
   <script src="/vendor/moment/moment.js"></script>
   <script src="/vendor/underscore/underscore.js"></script>
   <script src="/vendor/angular/angular.js"></script>
   <script src="/vendor/angular-route/angular-route.js"></script>
+  <script src="/vendor/angular-moment/angular-moment.js"></script>
+  <script src='/vendor/angular-google-maps/dist/angular-google-maps.js'></script>
 
   <!-- APP -->
   <script src="/app.js"></script>
