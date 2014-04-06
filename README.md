@@ -1,6 +1,3 @@
-feed-me-client
-==============
+### FEEDME Client
 
-Frontend server - Express + Angular
-
-To use first: npm install + bower install
+Basic angular front-facing interface 
