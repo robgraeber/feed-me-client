@@ -1,4 +1,6 @@
-window.app = angular.module('feed-me', [ 'ngRoute', 'google-maps']);
+window.app = angular.module('feed-me', [ 'ngRoute', 'google-maps', 'angularMoment']);
+
+// 
 
 // CORS: SET-UP IN ANGULAR-JS
 // http://stackoverflow.com/questions/17756550/angularjs-cors-issues
