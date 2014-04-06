@@ -7,7 +7,7 @@
   ],
   "license": "MIT",
   "private": true,
-  "directory":"public/vendor",
+  "directory": "public/vendor",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -15,5 +15,18 @@
     "public/bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "underscore": "~1.6.0",
+    "moment": "~2.5.1",
+    "angular": "~1.2.16",
+    "angular-route": "~1.2.16",
+    "bootstrap": "~3.1.1",
+    "angular-google-maps": "~1.0.18",
+    "ui-autocomplete": "~0.5.5",
+    "angular-moment": "~0.6.2"
+  },
+  "resolutions": {
+    "underscore": "~1.6.0"
+  }
 }
