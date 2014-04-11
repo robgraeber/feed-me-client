@@ -8,8 +8,8 @@ app.controller('HomeController',
       tomorrow,
       weekdays,
       FeedmeService, 
-      GeolocationService,
-      GeocodeService){
+      GeoapiService,
+      GeolatlngService){
 
     // SCOPE VARIABLES
     $scope.address    = 'San Francisco';
@@ -22,31 +22,24 @@ app.controller('HomeController',
     var filterAddressTimeout;
     moment.lang('en', weekdays);  
 
-    mapOffset         = -0.125;
+    mapOffset         = -0.0625;
     mapElement        = document.getElementById('map');
-
-    $scope.position = null;
-    $scope.message = "Determining gelocation...";
-    GeolocationService().then(function (position) {
-      $scope.position = position;
-      $scope.message = position;
-    }, function(reason){
-      $scope.message = "Geolocation could not be determined";
-    });
 
     initMap = function(){
       var dat         = $scope.events; 
       var addr        = $scope.address || 'San+Francisco';
-      return GeocodeService.get(addr).then(function(geoCenter){
-        geoloc        = geoCenter.data.results[0].geometry.location;
-        mapOptions['center'] = new google.maps.LatLng(geoloc.lat, geoloc.lng+mapOffset);
-        $scope.map    = new google.maps.Map(document.getElementById('map'), mapOptions);
+      return GeolatlngService().then(function(pos){
+        mapOptions.center = new google.maps.LatLng(pos.latitude,pos.longitude+mapOffset);
+        $scope.map    = new google.maps.Map(mapElement, mapOptions);
         for (var i    = 0; i < dat.length ; i++) {
           if(dat[i].marker){
             dat[i].marker.setMap(null);
             delete dat[i].marker;
           }
         }
+        GeoapiService.getAddress(pos).then(function(address){
+          $scope.address = address.data.results[0].formatted_address;
+        });
       });
     };
 
