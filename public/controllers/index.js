@@ -11,19 +11,20 @@ app.controller('HomeController',
       GeocodeService){
 
     // SCOPE VARIABLES
-    $scope.address          = 'San Francisco';
-    $scope.radius           = 5;
-    $scope.predicate        = 'time';
-    $scope.reverse          = false;
-    $scope.timeframe        = 'today';
-    var tempAddress         = '';
+    $scope.address    = 'San Francisco';
+    $scope.radius     = 5;
+    $scope.predicate  = 'time';
+    $scope.reverse    = false;
+    $scope.timeframe  = 'today';
+    $scope.isVisible  = function(event){return $filter('isVisible')(event, $scope)};
+    var tempAddress   = '';
     var filterAddressTimeout;
     moment.lang('en', weekdays);  
 
     mapOffset         = -0.125;
     mapElement        = document.getElementById('map');
 
-    $scope.initMap    = function(){
+    initMap = function(){
       var dat         = $scope.events; 
       var addr        = $scope.address || 'San+Francisco';
       return GeocodeService.get(addr).then(function(geoCenter){
@@ -39,42 +40,36 @@ app.controller('HomeController',
       });
     };
 
-    $scope.updateMap  = function() {
-      $scope.initMap().then($scope.filterMap);
+    updateMap  = function() {
+      initMap().then(function(){
+        var dat         = $scope.events; 
+        for (var i = 0; i < dat.length ; i++) {
+          venue         = dat[i].venue.address;
+          if($filter('isVisible')(dat[i], $scope)){
+            dat[i].marker = new google.maps.Marker({ 
+              'title': "Marker: " + i,
+              'map':$scope.map,
+              'position':new google.maps.LatLng(venue.latitude, venue.longitude)
+            });
+          } 
+        }
+      });
     }
-
-    $scope.filterMap  = function(){
-      var dat         = $scope.events; 
-      for (var i = 0; i < dat.length ; i++) {
-        venue         = dat[i].venue.address;
-        if($scope.isVisible(dat[i])){
-          dat[i].marker = new google.maps.Marker({ 
-            'title': "Marker: " + i,
-            'map':$scope.map,
-            'position':new google.maps.LatLng(venue.latitude, venue.longitude)
-          });
-        } 
-      }
-    };
-
-    $scope.isVisible  = function(event){
-      return $filter('time')(event, $scope) && $filter('radius')(event, $scope);
-    };
 
     $scope.update = function(){
       FeedmeService.get($scope.filterAddress)
       .then(function(res){ 
         $scope.events = res.data.results; })
       .then(function(){
-        $scope.reset();
+        reset();
         var dat                 = $scope.events;
         for(var i = 0 ; i < dat.length ; i++){
           dat[i].showDescription= false;
           dat[i].showTags       = false;
           dat[i].marker         = null;
         }
-        $scope.count();
-        $scope.updateMap();
+        count();
+        updateMap();
       });
     };
 
@@ -87,7 +82,7 @@ app.controller('HomeController',
       }, 500);
     });
 
-    $scope.count                = function(){
+    count = function(){
       var dat = $scope.events; 
       for(var i = 0 ; i < dat.length ; i++){
         var itime               = new Date(dat[i].time);
@@ -102,11 +97,11 @@ app.controller('HomeController',
       }
     }
 
-    $scope.reset                = function(){
-      $scope.countLT1           = $scope.countLT3      = $scope.countLT5      = 0;
-      $scope.countToday         = $scope.countTomorrow = $scope.countThisWeek = 0;
+    reset                = function(){
+      $scope.countLT1    = $scope.countLT3      = $scope.countLT5      = 0;
+      $scope.countToday  = $scope.countTomorrow = $scope.countThisWeek = 0;
     };
 
-    $scope.reset();
+    reset();
     $scope.update();
 });
