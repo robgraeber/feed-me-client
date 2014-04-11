@@ -1,8 +1,17 @@
 app.controller('HomeController', 
-    function($scope, $timeout, $filter, mapOptions, tonight, tomorrow, FeedmeService, GeocodeService){
+    function(
+      $scope, 
+      $timeout, 
+      $filter,
+      mapOptions, 
+      tonight,
+      tomorrow,
+      weekdays,
+      FeedmeService, 
+      GeocodeService){
 
     $scope.timeframe  = 'today';
-    moment.lang('en', {weekdays:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]});  
+    moment.lang('en', weekdays);  
     $scope.tagStyle = 'float:right;margin:0 4px 0 4px;opacity:.5;position:relative;height:17px';
 
     mapOffset         = -0.125;
