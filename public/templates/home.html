@@ -1,0 +1,160 @@
+<h1>Feeeeeed meeeee</h1>
+<style id="my-css">
+    map, div[map] {display:block; z-index:0;opacity:.9;position:absolute;top:0px;right:0px; width:100%; height:100%;}
+</style>
+
+<map id='map'></map>
+
+<div class='row' >
+
+  <div class='col-md-4 text-left'>
+    <div class="input-group">
+      <span class="input-group-addon"><div class='glyphicon glyphicon-map-marker'/></span>
+      <input 
+        ng-model='address' 
+        name='address' 
+        type="text" 
+        class="form-control" 
+        autofocus
+        placeholder="Zip, address">
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon"><div class='glyphicon glyphicon-time'/></span>
+      <div class="btn-group btn-group-justified">
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: timeframe == 'today'}" ng-click='timeframe = "today"; updateMap();'>
+            Today <span style='opacity:.5' class="badge">{{ countToday }}</span>
+          </button>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: timeframe == 'tomorrow'}" ng-click='timeframe = "tomorrow"; updateMap();'>
+            Tomorrow <span style='opacity:.5' class="badge">{{ countTomorrow }}</span>
+          </button>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: timeframe == 'later'}" ng-click='timeframe = "later"; updateMap();'>
+            Later <span style='opacity:.5' class="badge">{{ countThisWeek }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon"><div class='glyphicon glyphicon-hand-right'/></span>
+      <div class="btn-group btn-group-justified">
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: radius == 1}" ng-click='radius = 1; updateMap();'>
+            < 1 mi. <span style='opacity:.5' class="badge">{{ countLT1 }}</span>
+          </button>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: radius == 3}" ng-click='radius = 3; updateMap();'>
+            < 3 mi. <span style='opacity:.5' class="badge">{{ countLT3 }}</span>
+          </button>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: radius == 5}" ng-click='radius = 5; updateMap();'>
+            < 5 mi. <span style='opacity:.5' class="badge">{{ countLT5 }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon">
+        <div class='glyphicon glyphicon-sort-by-attributes'/>
+      </span>
+      <div class="btn-group btn-group-justified">
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: predicate == 'time'}"
+            ng-click='predicate = "time"'>
+            Time 
+          </button>
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+          <button type="button" class="btn btn-default" 
+            ng-class="{active: predicate == 'distance'}"
+            ng-click='predicate = "distance"'>
+            Distance 
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div style="height:20px"></div>
+
+<div class='table-responsive' style='width:60%'>
+  <table class="table table-hover table-condensed" style='background-color:white;opacity:.9'>
+    <tr ng-repeat="event in events | filter:filterByRadiusLT | filter:filterByTimeframe | orderBy: predicate: reverse">
+      <td width='20%'>
+        <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
+        <span class='glyphicon glyphicon-resize-small'
+          style='float:right;opacity:.5'
+          ng-show="event.showDescription " 
+          ng-click="event.showDescription = !event.showDescription" />
+        <span class='glyphicon glyphicon-resize-full' 
+          style='float:right;opacity:.5'
+          ng-show="!event.showDescription " 
+          ng-click="event.showDescription = !event.showDescription" />
+      </td>
+      <td width='57.5%'>
+        <b style='color:#222'>{{ event.name | capitalize }}</b>
+        <p style='color:#444;line-height:1.5' class='text-justify' ng-show='event.showDescription'> {{event.description}} </p>
+        <span ng-repeat="item in event.foodProvided"
+          ng-click='event.showTags = !event.showTags'
+          ng-show="!event.showTags">
+
+          <img src="/assets/by-jacob-halton/icon_4131.svg" style='{{tagStyle}}'
+            alt='Wine' ng-show="item == 'pastry'" />
+
+          <img src="/assets/by-edward-boatman/icon_332.svg" style='{{tagStyle}}'
+            alt='Wine' ng-show="item == 'wine' || item == 'drinks'" />
+
+          <img src="/assets/by-charlotte-vogel/icon_6996.svg"  style='{{tagStyle}}'
+            alt='Sushi' ng-show="item == 'sushi' || item == 'sushis'" />
+
+          <img src="/assets/public-domain/icon_17562.svg"  style='{{tagStyle}}'
+            alt='Food/Snacks' ng-show="item == 'food' || item == 'snacks'" />
+
+          <img src="/assets/by-edward-boatman/icon_593.svg" style='{{tagStyle}}'
+            alt='Beer' ng-show="item == 'beer' || item == 'beers'" />
+
+          <img src="/assets/by-stanislav-levin/icon_13158.svg" style='{{tagStyle}}'
+            alt='Pizza' ng-show="item == 'pizza' || item == 'pizzas'" />
+
+          <img src="/assets/by-dmitry-baranovskiy/icon_10959.svg"  style='{{tagStyle}}'
+            alt='Coffee' ng-show="item == 'coffee'" />
+        </span>
+
+        <span ng-repeat="item in event.foodProvided" class='badge'
+          style='float:right;margin:0 4px 0 4px'
+          ng-click='event.showTags = !event.showTags'
+          ng-show="event.showTags"> {{item}} </span>
+      </td>
+      <td width='22.5%'>
+        <span style='color:#888'>
+          At {{ event.distance | number:1 }} mi. 
+        </span>
+        <a class='glyphicon glyphicon-link' 
+          href="{{event.unique}}" style='float:right;margin:2px'/>
+          <address ng-show='event.showDescription'>
+            <strong>{{ event.venue.name }}</strong><br/>
+            {{ event.venue.address.address1 }}<br/>
+            {{ event.venue.address.city }}<br/>
+          </address>
+      </td>
+    </tr>
+  </table>
+</div>

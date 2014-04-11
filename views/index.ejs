@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Feed me</title>
+    <!-- BOOTSTRAP-CSS-->
+    <link href="/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+  </head>
+  <body ng-app='feed-me'>
+
+  <div class="container" ng-view></div>
+
+  <!-- JQUERY & BOOTSTRAP -->
+  <script src="/lib/jquery/dist/jquery.js"></script>
+  <script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/lib/bootstrap/js/button.js"></script>
+
+  <!-- LIBS-->
+  <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+  <script src="/lib/moment/moment.js"></script>
+  <script src="/lib/underscore/underscore.js"></script>
+  <script src="/lib/angular/angular.js"></script>
+  <script src="/lib/angular-route/angular-route.js"></script>
+  <script src="/lib/angular-moment/angular-moment.js"></script>
+  <script src='/lib/angular-google-maps/dist/angular-google-maps.js'></script>
+  <script src="lib/angularjs-google-maps/dist/ng-map.js"></script>
+
+  <!-- APP -->
+  <script src="/app.js"></script>
+  <script src="/router.js"></script>
+  <script src="/filters/capitalize.js"></script>
+  <script src="/services/api.js"></script>
+  <script src="/services/geocode.js"></script>
+  <script src="/controllers/index.js"></script>
+
+ </body>
+</html>
