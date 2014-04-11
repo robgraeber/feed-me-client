@@ -97,7 +97,7 @@
 
 <div class='table-responsive' style='width:60%'>
   <table class="table table-hover table-condensed" style='background-color:white;opacity:.9'>
-    <tr ng-repeat="event in events | filter:filterByRadiusLT | filter:filterByTimeframe | orderBy: predicate: reverse">
+    <tr ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse">
       <td width='20%'>
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
         <span class='glyphicon glyphicon-resize-small'

@@ -1,5 +1,5 @@
 app.controller('HomeController', 
-    function($scope, $timeout, ApiService, GeocodeService){
+    function($scope, $timeout, $filter, ApiService, GeocodeService){
 
     moment.lang('en', { weekdays : [ "Sun", "Mon", "Tue",
       "Wed", "Thu", "Fri", "Sat" ] });  
@@ -43,22 +43,8 @@ app.controller('HomeController',
     };
 
     $scope.isVisible  = function(event){
-      return $scope.filterByTimeframe(event) && $scope.filterByRadiusLT(event);
+      return $filter('time')(event, $scope) && $filter('radius')(event, $scope);
     };
-
-    $scope.filterByTimeframe = function(event){
-      var aTime = new Date(event.time);
-      if($scope.timeframe === "today"){
-        return aTime < $scope.tonight;
-      } else if($scope.timeframe === "tomorrow"){
-        return aTime >= $scope.tonight && aTime < $scope.tomorrow;
-      } else if($scope.timeframe === "later"){
-        return aTime >= $scope.tomorrow ;
-      } 
-      return true;
-    };
-
-    $scope.filterByRadiusLT = function(event){ return event.distance < $scope.radius; };
 
     $scope.update = function(){
       ApiService.get($scope.filterAddress)
