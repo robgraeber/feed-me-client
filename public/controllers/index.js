@@ -8,6 +8,7 @@ app.controller('HomeController',
       tomorrow,
       weekdays,
       FeedmeService, 
+      GeolocationService,
       GeocodeService){
 
     // SCOPE VARIABLES
@@ -23,6 +24,15 @@ app.controller('HomeController',
 
     mapOffset         = -0.125;
     mapElement        = document.getElementById('map');
+
+    $scope.position = null;
+    $scope.message = "Determining gelocation...";
+    GeolocationService().then(function (position) {
+      $scope.position = position;
+      $scope.message = position;
+    }, function(reason){
+      $scope.message = "Geolocation could not be determined";
+    });
 
     initMap = function(){
       var dat         = $scope.events; 
