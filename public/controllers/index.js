@@ -26,6 +26,19 @@ app.controller('HomeController',
   mapElement        = document.getElementById('map');
   markers           = [];
 
+  initMap = function(){
+    GeolatlngService().then(function(pos){
+      center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
+      mapOptions.center = center;
+      $scope.map.setCenter(mapOptions.center);
+      $scope.map = new google.maps.Map(mapElement, mapOptions);
+      GeoapiService.getAddress(pos).then(function(address){
+        $scope.address = address.data.results[0].formatted_address;
+        $scope.filterMarkers();
+      });
+    });
+  }
+
   $scope.filterMarkers = function() {
     var dat = $scope.events; 
     while(markers.length > 0){ markers.pop().setMap(null)};
@@ -39,7 +52,23 @@ app.controller('HomeController',
         markers[id].setMap($scope.map)
       } 
     }
-  };
+    markers.push(new google.maps.Circle({
+      strokeColor: '#b2182b',
+      strokeOpacity: 0.35,
+      strokeWeight: 2,
+      fillColor: '#b2182b',
+      fillOpacity: 0.0,
+      map: $scope.map,
+      center: $scope.coord,
+      radius: $scope.radius * 1.624 * 1000  
+    }));
+    var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0,0),
+      new google.maps.Point(10, 34));
+    markers.push(new google.maps.Marker({title: 'My position',
+      map: $scope.map, position: $scope.coord, icon: pinImage }));
+  }
 
   $scope.update = function(){
     FeedmeService.get($scope.filterAddress)
@@ -55,10 +84,11 @@ app.controller('HomeController',
       count();
       GeoapiService.getLatLng($scope.address).then(function(addr){
         var pos = addr.data.results[0].geometry.location;
-        center = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
-        $scope.map.setCenter(center);
+        $scope.coord = new google.maps.LatLng(pos.lat, pos.lng);
+        $scope.offsetCenter = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
+        $scope.map.setCenter($scope.offsetCenter);
+        $scope.filterMarkers();
       });
-      $scope.filterMarkers();
     });
   };
 
@@ -92,14 +122,8 @@ app.controller('HomeController',
   };
 
   reset();
-  GeolatlngService().then(function(pos){
-    center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
-    mapOptions.center = center;
-    $scope.map.setCenter(mapOptions.center);
-    $scope.map = new google.maps.Map(mapElement, mapOptions);
-    GeoapiService.getAddress(pos).then(function(address){
-      $scope.address = address.data.results[0].formatted_address;
-    });
-  });
+  initMap();
   $scope.update();
+  google.maps.event.addDomListener(window, 'resize', function() {
+      $scope.map.setCenter($scope.offsetCenter); });
 });
