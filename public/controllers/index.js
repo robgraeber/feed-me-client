@@ -1,11 +1,13 @@
 app.controller('HomeController', 
-    function($scope, $timeout, $filter, mapOptions, FeedmeService, GeocodeService){
+    function($scope, $timeout, $filter, mapOptions, tonight, tomorrow, FeedmeService, GeocodeService){
 
+    $scope.timeframe  = 'today';
     moment.lang('en', {weekdays:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]});  
     $scope.tagStyle = 'float:right;margin:0 4px 0 4px;opacity:.5;position:relative;height:17px';
 
     mapOffset         = -0.125;
     mapElement        = document.getElementById('map');
+
     $scope.initMap    = function(){
       var dat         = $scope.events; 
       var addr        = $scope.address || 'San+Francisco';
@@ -83,9 +85,9 @@ app.controller('HomeController',
         $scope.countLT1       += dat[i].distance < 1 ? 1 : 0;
         $scope.countLT3       += dat[i].distance < 3 ? 1 : 0;
         $scope.countLT5       += dat[i].distance < 5 ? 1 : 0;
-        $scope.countToday     += itime <  $scope.tonight ? 1 : 0;
-        $scope.countTomorrow  += itime >= $scope.tonight && itime < $scope.tomorrow ? 1 : 0;
-        $scope.countThisWeek  += itime >= $scope.tomorrow ? 1 : 0;
+        $scope.countToday     += itime <  tonight ? 1 : 0;
+        $scope.countTomorrow  += itime >= tonight && itime < tomorrow ? 1 : 0;
+        $scope.countThisWeek  += itime >= tomorrow ? 1 : 0;
         dat[i].timeFMT        = moment(new Date(dat[i].time)).calendar();
         dat[i].timeFMT = dat[i].timeFMT.replace(/(Today at )|(Tomorrow at )/,'');
       }
@@ -96,18 +98,8 @@ app.controller('HomeController',
       $scope.countToday       = $scope.countTomorrow = $scope.countThisWeek = 0;
     };
 
-    $scope.initDatetime       = function(){
-      $scope.timeframe        = 'today';
-      $scope.tonight          = new Date();
-      $scope.tonight.setHours(23,59,59,999);
-      $scope.tomorrow         = new Date($scope.tonight.getFullYear(), 
-          $scope.tonight.getMonth(), $scope.tonight.getDate()+1);
-      $scope.tomorrow.setHours(23,59,59,999);
-    };
-
     $scope.init = function(){// INITITIALIZE CONTROLLER
       $scope.initCounts();
-      $scope.initDatetime();
       $scope.address          = 'San Francisco';
       $scope.radius           = 5;
       $scope.predicate        = 'time';

@@ -1,12 +1,12 @@
-app.filter('time', function(){
+app.filter('time', function(tonight, tomorrow){
   return function(event, scope) {
     var aTime = new Date(event.time);
     if(scope.timeframe === "today"){
-      return aTime < scope.tonight;
+      return aTime < tonight;
     } else if(scope.timeframe === "tomorrow"){
-      return aTime >= scope.tonight && aTime < scope.tomorrow;
+      return aTime >= tonight && aTime < tomorrow;
     } else if(scope.timeframe === "later"){
-      return aTime >= scope.tomorrow ;
+      return aTime >= tomorrow ;
     } 
     return true;
   }
