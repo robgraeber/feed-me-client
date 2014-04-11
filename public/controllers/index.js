@@ -12,7 +12,6 @@ app.controller('HomeController',
 
     $scope.timeframe  = 'today';
     moment.lang('en', weekdays);  
-    $scope.tagStyle = 'float:right;margin:0 4px 0 4px;opacity:.5;position:relative;height:17px';
 
     mapOffset         = -0.125;
     mapElement        = document.getElementById('map');

@@ -1,7 +1,4 @@
 <h1>Feeeeeed meeeee</h1>
-<style id="my-css">
-    map, div[map] {display:block; z-index:0;opacity:.9;position:absolute;top:0px;right:0px; width:100%; height:100%;}
-</style>
 
 <map id='map'></map>
 
@@ -116,25 +113,25 @@
           ng-click='event.showTags = !event.showTags'
           ng-show="!event.showTags">
 
-          <img src="/assets/by-jacob-halton/icon_4131.svg" style='{{tagStyle}}'
+          <img src="/assets/by-jacob-halton/icon_4131.svg" class='tag'
             alt='Wine' ng-show="item == 'pastry'" />
 
-          <img src="/assets/by-edward-boatman/icon_332.svg" style='{{tagStyle}}'
+          <img src="/assets/by-edward-boatman/icon_332.svg" class='tag'
             alt='Wine' ng-show="item == 'wine' || item == 'drinks'" />
 
-          <img src="/assets/by-charlotte-vogel/icon_6996.svg"  style='{{tagStyle}}'
+          <img src="/assets/by-charlotte-vogel/icon_6996.svg" class='tag'
             alt='Sushi' ng-show="item == 'sushi' || item == 'sushis'" />
 
-          <img src="/assets/public-domain/icon_17562.svg"  style='{{tagStyle}}'
+          <img src="/assets/public-domain/icon_17562.svg" class='tag'
             alt='Food/Snacks' ng-show="item == 'food' || item == 'snacks'" />
 
-          <img src="/assets/by-edward-boatman/icon_593.svg" style='{{tagStyle}}'
+          <img src="/assets/by-edward-boatman/icon_593.svg" class='tag'
             alt='Beer' ng-show="item == 'beer' || item == 'beers'" />
 
-          <img src="/assets/by-stanislav-levin/icon_13158.svg" style='{{tagStyle}}'
+          <img src="/assets/by-stanislav-levin/icon_13158.svg" class='tag'
             alt='Pizza' ng-show="item == 'pizza' || item == 'pizzas'" />
 
-          <img src="/assets/by-dmitry-baranovskiy/icon_10959.svg"  style='{{tagStyle}}'
+          <img src="/assets/by-dmitry-baranovskiy/icon_10959.svg" class='tag'
             alt='Coffee' ng-show="item == 'coffee'" />
         </span>
 
