@@ -10,7 +10,14 @@ app.controller('HomeController',
       FeedmeService, 
       GeocodeService){
 
-    $scope.timeframe  = 'today';
+    // SCOPE VARIABLES
+    $scope.address          = 'San Francisco';
+    $scope.radius           = 5;
+    $scope.predicate        = 'time';
+    $scope.reverse          = false;
+    $scope.timeframe        = 'today';
+    var tempAddress         = '';
+    var filterAddressTimeout;
     moment.lang('en', weekdays);  
 
     mapOffset         = -0.125;
@@ -59,61 +66,47 @@ app.controller('HomeController',
       .then(function(res){ 
         $scope.events = res.data.results; })
       .then(function(){
-        $scope.initCounts();
-        $scope.initEvents();
-        $scope.updateCount();
+        $scope.reset();
+        var dat                 = $scope.events;
+        for(var i = 0 ; i < dat.length ; i++){
+          dat[i].showDescription= false;
+          dat[i].showTags       = false;
+          dat[i].marker         = null;
+        }
+        $scope.count();
         $scope.updateMap();
       });
     };
 
-    var tempAddress = '', filterAddressTimeout;
-
     $scope.$watch('address', function(val){
       if(filterAddressTimeout) $timeout.cancel(filterAddressTimeout);
       tempAddress = val;
-      filterAddressTimeout = $timeout(function() {
-        $scope.filterAddress = tempAddress;
+      filterAddressTimeout      = $timeout(function() {
+        $scope.filterAddress    = tempAddress;
         $scope.update();
       }, 500);
     });
 
-    $scope.initEvents = function(){
-      var dat = $scope.events;
-      for(var i = 0 ; i < dat.length ; i++){
-        dat[i].showDescription  = false;
-        dat[i].showTags         = false;
-        dat[i].marker           = null;
-      }
-    }
-
-    $scope.updateCount = function(){
+    $scope.count                = function(){
       var dat = $scope.events; 
       for(var i = 0 ; i < dat.length ; i++){
-        var itime              = new Date(dat[i].time);
-        $scope.countLT1       += dat[i].distance < 1 ? 1 : 0;
-        $scope.countLT3       += dat[i].distance < 3 ? 1 : 0;
-        $scope.countLT5       += dat[i].distance < 5 ? 1 : 0;
-        $scope.countToday     += itime <  tonight ? 1 : 0;
-        $scope.countTomorrow  += itime >= tonight && itime < tomorrow ? 1 : 0;
-        $scope.countThisWeek  += itime >= tomorrow ? 1 : 0;
-        dat[i].timeFMT        = moment(new Date(dat[i].time)).calendar();
+        var itime               = new Date(dat[i].time);
+        $scope.countLT1         += dat[i].distance < 1 ? 1 : 0;
+        $scope.countLT3         += dat[i].distance < 3 ? 1 : 0;
+        $scope.countLT5         += dat[i].distance < 5 ? 1 : 0;
+        $scope.countToday       += itime <  tonight ? 1 : 0;
+        $scope.countTomorrow    += itime >= tonight && itime < tomorrow ? 1 : 0;
+        $scope.countThisWeek    += itime >= tomorrow ? 1 : 0;
+        dat[i].timeFMT          = moment(new Date(dat[i].time)).calendar();
         dat[i].timeFMT = dat[i].timeFMT.replace(/(Today at )|(Tomorrow at )/,'');
       }
     }
 
-    $scope.initCounts         = function(){
-      $scope.countLT1         = $scope.countLT3      = $scope.countLT5      = 0;
-      $scope.countToday       = $scope.countTomorrow = $scope.countThisWeek = 0;
+    $scope.reset                = function(){
+      $scope.countLT1           = $scope.countLT3      = $scope.countLT5      = 0;
+      $scope.countToday         = $scope.countTomorrow = $scope.countThisWeek = 0;
     };
 
-    $scope.init = function(){// INITITIALIZE CONTROLLER
-      $scope.initCounts();
-      $scope.address          = 'San Francisco';
-      $scope.radius           = 5;
-      $scope.predicate        = 'time';
-      $scope.reverse          = false;
-      $scope.update();      // BOOTSTRAP DATA 
-    };
-
-    $scope.init();
+    $scope.reset();
+    $scope.update();
 });
