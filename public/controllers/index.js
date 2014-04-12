@@ -22,9 +22,10 @@ app.controller('HomeController',
   var filterAddressTimeout;
   moment.lang('en', weekdays);  
 
-  mapOffset         = -0.0625;
+  mapOffset         = -0.10;
   mapElement        = document.getElementById('map');
-  markers           = [];
+  mapEvents         = [];
+  var mapRadius, mapCenter;
 
   initMap = function(){
     GeolatlngService().then(function(pos){
@@ -38,21 +39,34 @@ app.controller('HomeController',
       });
     });
   }
+  
+  setCenter = function(){
+    mapCenter && mapCenter.setMap(null);
+    mapCenter && google.maps.event.clearListeners(mapCenter, "dragend");
+    var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0,0),
+      new google.maps.Point(10, 34));
+    mapCenter = new google.maps.Marker({
+      title: 'My position',
+      map: $scope.map, 
+      draggable:true, 
+      position: $scope.coord, 
+      icon: pinImage });
+    google.maps.event.addListener(mapCenter, "dragend", function(event) {
+      $scope.coord = mapCenter.getPosition();
+      $scope.offsetCenter = new google.maps.LatLng(
+        mapCenter.getPosition().lat(),
+        mapCenter.getPosition().lng()+mapOffset);
+      $scope.map.setCenter($scope.offsetCenter); 
+      $scope.address = '';
+      $scope.filterMarkers();
+    });
+  };
 
-  $scope.filterMarkers = function() {
-    var dat = $scope.events; 
-    while(markers.length > 0){ markers.pop().setMap(null)};
-    for (var i = 0; i < dat.length ; i++) {
-      if($filter('isVisible')(dat[i], $scope)){
-        venue = dat[i].venue.address;
-        markers.push(new google.maps.Marker({ 'title': dat[i].title }));
-        id = markers.length - 1;
-        position = new google.maps.LatLng(venue.latitude, venue.longitude);
-        markers[id].setPosition(position);
-        markers[id].setMap($scope.map)
-      } 
-    }
-    markers.push(new google.maps.Circle({
+  drawRadius = function(){
+    mapRadius && mapRadius.setMap(null);
+    mapRadius = new google.maps.Circle({
       strokeColor: '#b2182b',
       strokeOpacity: 0.35,
       strokeWeight: 2,
@@ -61,13 +75,24 @@ app.controller('HomeController',
       map: $scope.map,
       center: $scope.coord,
       radius: $scope.radius * 1.624 * 1000  
-    }));
-    var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
-      new google.maps.Size(21, 34),
-      new google.maps.Point(0,0),
-      new google.maps.Point(10, 34));
-    markers.push(new google.maps.Marker({title: 'My position',
-      map: $scope.map, position: $scope.coord, icon: pinImage }));
+    });
+  };
+
+  $scope.filterMarkers = function() {
+    var dat = $scope.events; 
+    while(mapEvents.length > 0){ mapEvents.pop().setMap(null)};
+    for (var i = 0; i < dat.length ; i++) {
+      if($filter('isVisible')(dat[i], $scope)){
+        venue = dat[i].venue.address;
+        mapEvents.push(new google.maps.Marker({ 'title': dat[i].title }));
+        id = mapEvents.length - 1;
+        position = new google.maps.LatLng(venue.latitude, venue.longitude);
+        mapEvents[id].setPosition(position);
+        mapEvents[id].setMap($scope.map)
+      } 
+    }
+    drawRadius();
+    setCenter();
   }
 
   $scope.update = function(){
