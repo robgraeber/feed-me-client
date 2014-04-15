@@ -3,6 +3,7 @@ app.controller('HomeController',
     $scope, 
     $timeout, 
     $filter,
+    $location,
     mapOptions, 
     tonight,
     tomorrow,
@@ -30,9 +31,11 @@ app.controller('HomeController',
   initMap = function(){
     GeolatlngService().then(function(pos){
       center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
-      mapOptions.center = center;
-      $scope.map.setCenter(mapOptions.center);
-      $scope.map = new google.maps.Map(mapElement, mapOptions);
+      var theme = $location.path() === '/' ? 'default' : $location.path();
+      var mapTheme = mapOptions[theme.replace('/','')];
+      mapTheme.center = center;
+      $scope.map.setCenter(mapTheme.center);
+      $scope.map = new google.maps.Map(mapElement, mapTheme);
       GeoapiService.getAddress(pos).then(function(address){
         $scope.address = address.data.results[0].formatted_address;
         $scope.filterMarkers();
@@ -68,8 +71,8 @@ app.controller('HomeController',
     mapRadius && mapRadius.setMap(null);
     mapRadius = new google.maps.Circle({
       strokeColor: '#b2182b',
-      strokeOpacity: 0.35,
-      strokeWeight: 2,
+      strokeOpacity: 0.7,
+      strokeWeight: 4,
       fillColor: '#b2182b',
       fillOpacity: 0.0,
       map: $scope.map,

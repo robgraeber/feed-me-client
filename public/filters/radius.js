@@ -8,9 +8,7 @@ app.filter('radius', function(){
     var y = (lat2-lat1);
     var R = 6371;
     var km2miles = 0.621371192;
-    var d = Math.sqrt(x*x + y*y) * R * km2miles ;
-    console.log(d);
-    return d;
+    return Math.sqrt(x*x + y*y) * R * km2miles ;
   };
 
   return function(event, scope) {
