@@ -86,8 +86,8 @@ app.controller('HomeController',
         mapCenter.getPosition().lat(),
         mapCenter.getPosition().lng()+mapOffset);
       $scope.map.setCenter($scope.offsetCenter); 
-      $scope.address = '';
-      $scope.filterMarkers();
+      $scope.address = mapCenter.getPosition().lat()+','+mapCenter.getPosition().lng();
+      FeedmeService.get($scope.filterAddress).then(function(){ $scope.filterMarkers(); });
     });
   };
 
@@ -150,7 +150,7 @@ app.controller('HomeController',
     filterAddressTimeout      = $timeout(function() {
       $scope.filterAddress    = tempAddress;
       $scope.update();
-    }, 500);
+    }, 800);
   });
 
   count = function(){
