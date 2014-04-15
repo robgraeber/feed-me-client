@@ -1,7 +1,6 @@
-<h1>Feeeeeed meeeee</h1>
+<h1>Food Piggy</h1>
 
 <map id='map'></map>
-
 
 <div class='row' >
 
@@ -87,7 +86,12 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <div class="input-group">
+    <span ng-repeat='mapOption in mapOptions' style='display:block; margin: -1.5px 0;'>
+      <a href="/#/{{mapOption}}">{{mapOption}}</a><br> 
+    </span>
   </div>
 
 </div>
