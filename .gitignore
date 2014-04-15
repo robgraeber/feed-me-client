@@ -3,6 +3,6 @@
 /public/bower_components
 /public/vendor
 /public/lib
-/server.log
+server.log
 azure.err
 setup-env.sh
