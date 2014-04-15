@@ -3,6 +3,7 @@ app.controller('HomeController',
     $scope, 
     $timeout, 
     $filter,
+    $location,
     mapOptions, 
     tonight,
     tomorrow,
@@ -12,6 +13,7 @@ app.controller('HomeController',
     GeolatlngService){
 
   // SCOPE VARIABLES
+  $scope.mapOptions = Object.keys(mapOptions);
   $scope.address    = 'San Francisco';
   $scope.radius     = 5;
   $scope.predicate  = 'time';
@@ -22,17 +24,36 @@ app.controller('HomeController',
   var filterAddressTimeout;
   moment.lang('en', weekdays);  
 
-  mapOffset         = -0.10;
-  mapElement        = document.getElementById('map');
-  mapEvents         = [];
+  var mapOffset         = -0.10;
+  var mapElement        = document.getElementById('map');
+  var mapEvents         = [];
   var mapRadius, mapCenter;
 
   initMap = function(){
     GeolatlngService().then(function(pos){
       center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
-      mapOptions.center = center;
-      $scope.map.setCenter(mapOptions.center);
-      $scope.map = new google.maps.Map(mapElement, mapOptions);
+      var theme = $location.path() === '/' ? 'default' : $location.path();
+      var mapTheme = mapOptions[theme.replace('/','')];
+      mapTheme.center = center;
+      mapTheme.zoomControlOptions = { 
+	      style: google.maps.ZoomControlStyle.LARGE, 
+	      position: google.maps.ControlPosition.RIGHT_CENTER };
+      $scope.map.setCenter(mapTheme.center);
+      $scope.map = new google.maps.Map(mapElement, mapTheme);
+      google.maps.event.addDomListener($scope.map, 'bounds_changed', function(){
+        var bounds = $scope.map.getBounds();
+        var ne = bounds.getNorthEast();
+        var sw = bounds.getSouthWest();
+        var difflat = Math.abs(ne.lat()-sw.lat());
+        var difflng = Math.abs(ne.lng()-sw.lng());
+        mapOffset = difflng * .25 * (-1); 
+        $scope.coord = mapCenter.getPosition();
+        $scope.offsetCenter = new google.maps.LatLng(
+          mapCenter.getPosition().lat(),
+          mapCenter.getPosition().lng()+mapOffset);
+        $scope.map.setCenter($scope.offsetCenter); 
+      });
+      google.maps.event.addDomListener(window, 'resize', function() { $scope.map.setCenter($scope.offsetCenter); });
       GeoapiService.getAddress(pos).then(function(address){
         $scope.address = address.data.results[0].formatted_address;
         $scope.filterMarkers();
@@ -41,6 +62,12 @@ app.controller('HomeController',
   }
   
   setCenter = function(){
+    var bounds = $scope.map.getBounds();
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+    var difflat = Math.abs(ne.lat()-sw.lat());
+    var difflng = Math.abs(ne.lng()-sw.lng());
+    mapOffset = difflng * .25 * (-1); 
     mapCenter && mapCenter.setMap(null);
     mapCenter && google.maps.event.clearListeners(mapCenter, "dragend");
     var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
@@ -59,8 +86,8 @@ app.controller('HomeController',
         mapCenter.getPosition().lat(),
         mapCenter.getPosition().lng()+mapOffset);
       $scope.map.setCenter($scope.offsetCenter); 
-      $scope.address = '';
-      $scope.filterMarkers();
+      $scope.address = mapCenter.getPosition().lat()+','+mapCenter.getPosition().lng();
+      FeedmeService.get($scope.filterAddress).then(function(){ $scope.filterMarkers(); });
     });
   };
 
@@ -68,8 +95,8 @@ app.controller('HomeController',
     mapRadius && mapRadius.setMap(null);
     mapRadius = new google.maps.Circle({
       strokeColor: '#b2182b',
-      strokeOpacity: 0.35,
-      strokeWeight: 2,
+      strokeOpacity: 0.7,
+      strokeWeight: 4,
       fillColor: '#b2182b',
       fillOpacity: 0.0,
       map: $scope.map,
@@ -123,7 +150,7 @@ app.controller('HomeController',
     filterAddressTimeout      = $timeout(function() {
       $scope.filterAddress    = tempAddress;
       $scope.update();
-    }, 500);
+    }, 800);
   });
 
   count = function(){
@@ -149,6 +176,4 @@ app.controller('HomeController',
   reset();
   initMap();
   $scope.update();
-  google.maps.event.addDomListener(window, 'resize', function() {
-      $scope.map.setCenter($scope.offsetCenter); });
 });
