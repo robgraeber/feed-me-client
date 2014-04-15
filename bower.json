@@ -25,5 +25,8 @@
     "angular-google-maps": "~1.0.18",
     "angular-moment": "~0.6.2",
     "angularjs-google-maps": "https://github.com/allenhwkim/angularjs-google-maps.git#~0.3.8"
+  },
+  "resolutions": {
+    "underscore": "~1.5.x"
   }
 }
