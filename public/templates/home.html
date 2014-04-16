@@ -101,7 +101,9 @@
 <div class='table-responsive' style='width:60%'>
   <table class="table table-hover table-condensed" style='background-color:white;opacity:.9'>
     <tr ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse">
-      <td width='20%'>
+      <td width='20%' 
+        ng-mouseover="event.highlightMarker();"
+        ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
         <span class='glyphicon glyphicon-resize-small'
           style='float:right;opacity:.5'
@@ -112,7 +114,10 @@
           ng-show="!event.showDescription " 
           ng-click="event.showDescription = !event.showDescription" />
       </td>
-      <td width='57.5%'>
+
+      <td width='57.5%' 
+        ng-mouseover="event.highlightMarker();"
+        ng-mouseout="event.normalizeMarker()">
         <b style='color:#222'>{{ event.name | capitalize }}</b>
         <p style='color:#444;line-height:1.5' class='text-justify' ng-show='event.showDescription'> {{event.description}} </p>
         <span ng-repeat="item in event.foodProvided"
@@ -146,7 +151,8 @@
           ng-click='event.showTags = !event.showTags'
           ng-show="event.showTags"> {{item}} </span>
       </td>
-      <td width='22.5%'>
+
+      <td width='22.5%' ng-mouserover="event.highlightMarker()">
         <span style='color:#888'>
           At {{ event.distance | number:1 }} mi. 
         </span>

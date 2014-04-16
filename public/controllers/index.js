@@ -8,6 +8,9 @@ app.controller('HomeController',
     tonight,
     tomorrow,
     weekdays,
+    highlightMarkerUri,
+    normalMarkerUri,
+    pinMarkerUri,
     FeedmeService, 
     GeoapiService,
     GeolatlngService){
@@ -27,6 +30,7 @@ app.controller('HomeController',
   var mapOffset         = -0.10;
   var mapElement        = document.getElementById('map');
   var mapEvents         = [];
+  var mapLastInfoWindow = null;
   var mapRadius, mapCenter;
 
   initMap = function(){
@@ -70,7 +74,7 @@ app.controller('HomeController',
     mapOffset = difflng * .25 * (-1); 
     mapCenter && mapCenter.setMap(null);
     mapCenter && google.maps.event.clearListeners(mapCenter, "dragend");
-    var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
+    var pinImage = new google.maps.MarkerImage(pinMarkerUri,
       new google.maps.Size(21, 34),
       new google.maps.Point(0,0),
       new google.maps.Point(10, 34));
@@ -116,6 +120,19 @@ app.controller('HomeController',
         position = new google.maps.LatLng(venue.latitude, venue.longitude);
         mapEvents[id].setPosition(position);
         mapEvents[id].setMap($scope.map)
+        dat[i].map = mapEvents[id];
+        dat[i].highlightMarker = function(){ this.map.setIcon(highlightMarkerUri); };
+        dat[i].normalizeMarker = function(){ this.map.setIcon(null); };
+        dat[i].infoWindow = new google.maps.InfoWindow({content: dat[i].name});
+        dat[i].infoWindow.setPosition(dat[i].map.getPosition());
+        // http://stackoverflow.com/questions/7044587/adding-multiple-markers-with-infowindows-google-maps-api
+        google.maps.event.addListener(dat[i].map, 'click', function(event) {
+          return function() {
+            mapLastInfoWindow && mapLastInfoWindow.close();
+            mapLastInfoWindow = event.infoWindow;
+            event.infoWindow.open($scope.map, event.map);
+          }
+        }(dat[i]));
       } 
     }
     drawRadius();
