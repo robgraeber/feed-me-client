@@ -4,6 +4,7 @@ app.controller('HomeController',
     $timeout, 
     $filter,
     $location,
+    $window,
     mapOptions, 
     tonight,
     tomorrow,
@@ -23,6 +24,9 @@ app.controller('HomeController',
   $scope.reverse    = false;
   $scope.timeframe  = 'today';
   $scope.isVisible  = function(event){return $filter('isVisible')(event, $scope)};
+  $scope.pageSize   = 10;
+  $scope.tableHeight= .5*$window.innerHeight;
+
   var tempAddress   = '';
   var filterAddressTimeout;
   moment.lang('en', weekdays);  
@@ -36,7 +40,7 @@ app.controller('HomeController',
   initMap = function(){
     GeolatlngService().then(function(pos){
       center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
-      var theme = $location.path() === '/' ? 'default' : $location.path();
+      var theme = $location.search().mapOption ? $location.search().mapOption : 'default';
       var mapTheme = mapOptions[theme.replace('/','')];
       mapTheme.center = center;
       mapTheme.zoomControlOptions = { 
@@ -57,7 +61,9 @@ app.controller('HomeController',
           mapCenter.getPosition().lng()+mapOffset);
         $scope.map.setCenter($scope.offsetCenter); 
       });
-      google.maps.event.addDomListener(window, 'resize', function() { $scope.map.setCenter($scope.offsetCenter); });
+      google.maps.event.addDomListener(window, 'resize', function() { 
+          $scope.map.setCenter($scope.offsetCenter); 
+      });
       GeoapiService.getAddress(pos).then(function(address){
         $scope.address = address.data.results[0].formatted_address;
         $scope.filterMarkers();
@@ -139,22 +145,21 @@ app.controller('HomeController',
     setCenter();
   }
 
-  $scope.update = function(){
-    FeedmeService.get($scope.filterAddress)
-    .then(function(res){ 
-      $scope.events = res.data.results; 
+  $scope.update               = function(){
+    FeedmeService.get($scope.filterAddress).then(function(res){ 
+      $scope.events           = res.data.results; 
       reset();
       var dat                 = $scope.events;
       for(var i = 0 ; i < dat.length ; i++){
         dat[i].showDescription= false;
         dat[i].showTags       = false;
-        dat[i].marker         = null;
+        dat[i].marker         =  null;
       }
       count();
       GeoapiService.getLatLng($scope.address).then(function(addr){
-        var pos = addr.data.results[0].geometry.location;
-        $scope.coord = new google.maps.LatLng(pos.lat, pos.lng);
-        $scope.offsetCenter = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
+        var pos               = addr.data.results[0].geometry.location;
+        $scope.coord          = new google.maps.LatLng(pos.lat, pos.lng            );
+        $scope.offsetCenter   = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
         $scope.map.setCenter($scope.offsetCenter);
         $scope.filterMarkers();
       });
@@ -172,18 +177,25 @@ app.controller('HomeController',
 
   count = function(){
     var dat = $scope.events; 
+    $scope.count = {
+      'today'   :{'LT1':0,'LT3':0,'LT5':0},
+      'tomorrow':{'LT1':0,'LT3':0,'LT5':0},
+      'thisweek':{'LT1':0,'LT3':0,'LT5':0}};
     for(var i = 0 ; i < dat.length ; i++){
       var itime               = new Date(dat[i].time);
-      $scope.countLT1         += dat[i].distance < 1 ? 1 : 0;
-      $scope.countLT3         += dat[i].distance < 3 ? 1 : 0;
-      $scope.countLT5         += dat[i].distance < 5 ? 1 : 0;
-      $scope.countToday       += itime <  tonight ? 1 : 0;
-      $scope.countTomorrow    += itime >= tonight && itime < tomorrow ? 1 : 0;
-      $scope.countThisWeek    += itime >= tomorrow ? 1 : 0;
-      dat[i].timeFMT          = moment(new Date(dat[i].time)).calendar();
+      if(itime <  tonight  &&                      dat[i].distance < 1) $scope.count.today.LT1++;
+      if(itime <  tonight  &&                      dat[i].distance < 3) $scope.count.today.LT3++;
+      if(itime <  tonight  &&                      dat[i].distance < 5) $scope.count.today.LT5++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 1) $scope.count.tomorrow.LT1++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 3) $scope.count.tomorrow.LT3++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 5) $scope.count.tomorrow.LT5++;
+      if(                     itime >= tomorrow && dat[i].distance < 1) $scope.count.thisweek.LT1++;
+      if(                     itime >= tomorrow && dat[i].distance < 3) $scope.count.thisweek.LT3++;
+      if(                     itime >= tomorrow && dat[i].distance < 5) $scope.count.thisweek.LT5++;
+      dat[i].timeFMT = moment(new Date(dat[i].time)).calendar();
       dat[i].timeFMT = dat[i].timeFMT.replace(/(Today at )|(Tomorrow at )/,'');
     }
-  }
+  };
 
   reset                = function(){
     $scope.countLT1    = $scope.countLT3      = $scope.countLT5      = 0;
@@ -193,4 +205,5 @@ app.controller('HomeController',
   reset();
   initMap();
   $scope.update();
+
 });

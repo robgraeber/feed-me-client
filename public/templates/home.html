@@ -16,26 +16,25 @@
         placeholder="Zip, address">
     </div>
 
-
     <div class="input-group">
       <span class="input-group-addon"><div class='glyphicon glyphicon-time'/></span>
       <div class="btn-group btn-group-justified">
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
             ng-class="{active: timeframe == 'today'}" ng-click='timeframe = "today"; filterMarkers();'>
-            Today <span style='opacity:.5' class="badge">{{ countToday }}</span>
+            Today <span style='opacity:.5' class="badge">{{ count.today.LT5 }}</span>
           </button>
         </div>
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
             ng-class="{active: timeframe == 'tomorrow'}" ng-click='timeframe = "tomorrow"; filterMarkers();'>
-            Tomorrow <span style='opacity:.5' class="badge">{{ countTomorrow }}</span>
+            Tomorrow <span style='opacity:.5' class="badge">{{ count.tomorrow.LT5 }}</span>
           </button>
         </div>
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
-            ng-class="{active: timeframe == 'later'}" ng-click='timeframe = "later"; filterMarkers();'>
-            Later <span style='opacity:.5' class="badge">{{ countThisWeek }}</span>
+            ng-class="{active: timeframe == 'thisweek' }" ng-click='timeframe = "thisweek"; filterMarkers();'>
+            Later <span style='opacity:.5' class="badge">{{ count.thisweek.LT5 }}</span>
           </button>
         </div>
       </div>
@@ -47,19 +46,19 @@
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
             ng-class="{active: radius == 1}" ng-click='radius = 1; filterMarkers();'>
-            < 1 mi. <span style='opacity:.5' class="badge">{{ countLT1 }}</span>
+            < 1 mi. <span style='opacity:.5' class="badge">{{ count[timeframe].LT1 }}</span>
           </button>
         </div>
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
             ng-class="{active: radius == 3}" ng-click='radius = 3; filterMarkers();'>
-            < 3 mi. <span style='opacity:.5' class="badge">{{ countLT3 }}</span>
+            < 3 mi. <span style='opacity:.5' class="badge">{{ count[timeframe].LT3 }}</span>
           </button>
         </div>
         <div class="btn-group" data-toggle="buttons">
           <button type="button" class="btn btn-default" 
             ng-class="{active: radius == 5}" ng-click='radius = 5; filterMarkers();'>
-            < 5 mi. <span style='opacity:.5' class="badge">{{ countLT5 }}</span>
+            < 5 mi. <span style='opacity:.5' class="badge">{{ count[timeframe].LT5 }}</span>
           </button>
         </div>
       </div>
@@ -90,36 +89,32 @@
 
   <div class="input-group">
     <span ng-repeat='mapOption in mapOptions' style='display:block; margin: -1.5px 0;'>
-      <a href="/#/{{mapOption}}">{{mapOption}}</a><br> 
+      <a href="/#/?mapOption={{mapOption}}">{{mapOption}}</a><br> 
     </span>
   </div>
 
 </div>
 
-<div style="height:20px"></div>
+<div style="height:20px" class="ng-scope"></div>
 
-<div class='table-responsive' style='width:60%'>
-  <table class="table table-hover table-condensed" style='background-color:white;opacity:.9'>
-    <tr ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse">
-      <td width='20%' 
+<div class='table-responsive' style='width:50%; height:{{ tableHeight }}px;
+overflow: auto; overflow-y:scroll;'>
+  <table class="table table-condensed" style='background-color:white; opacity:.9;-moz-border-radius: 30px 30px / 30px
+30px; border-radius: 30px 30px / 30px 30px;'>
+    <tr  
+      ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " 
+      infinite-scroll="myPagingFunction()" 
+      infinite-scroll-distance="3">
+      <td width='120px' 
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
-        <span class='glyphicon glyphicon-resize-small'
-          style='float:right;opacity:.5'
-          ng-show="event.showDescription " 
-          ng-click="event.showDescription = !event.showDescription" />
-        <span class='glyphicon glyphicon-resize-full' 
-          style='float:right;opacity:.5'
-          ng-show="!event.showDescription " 
-          ng-click="event.showDescription = !event.showDescription" />
       </td>
 
-      <td width='57.5%' 
+      <td  
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker()">
         <b style='color:#222'>{{ event.name | capitalize }}</b>
-        <p style='color:#444;line-height:1.5' class='text-justify' ng-show='event.showDescription'> {{event.description}} </p>
         <span ng-repeat="item in event.foodProvided"
           ng-click='event.showTags = !event.showTags'
           ng-show="!event.showTags">
@@ -152,18 +147,17 @@
           ng-show="event.showTags"> {{item}} </span>
       </td>
 
-      <td width='22.5%' ng-mouserover="event.highlightMarker()">
+      <td width='100px' 
+        ng-mouseover="event.highlightMarker();"
+        ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>
           At {{ event.distance | number:1 }} mi. 
         </span>
         <a class='glyphicon glyphicon-link' 
           href="{{event.unique}}" style='float:right;margin:2px'/>
-          <address ng-show='event.showDescription'>
-            <strong>{{ event.venue.name }}</strong><br/>
-            {{ event.venue.address.address1 }}<br/>
-            {{ event.venue.address.city }}<br/>
-          </address>
       </td>
     </tr>
   </table>
+
 </div>
+
