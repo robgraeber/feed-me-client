@@ -12,6 +12,7 @@ app.controller('HomeController',
     highlightMarkerUri,
     normalMarkerUri,
     pinMarkerUri,
+    usSpinnerService,
     FeedmeService, 
     GeoapiService,
     GeolatlngService){
@@ -36,6 +37,9 @@ app.controller('HomeController',
   var mapEvents         = [];
   var mapLastInfoWindow = null;
   var mapRadius, mapCenter;
+
+  $scope.startSpin = function(){ usSpinnerService.spin('spinner-1'); }
+  $scope.stopSpin  = function(){ usSpinnerService.stop('spinner-1'); }
 
   initMap = function(){
     GeolatlngService().then(function(pos){
@@ -143,6 +147,7 @@ app.controller('HomeController',
     }
     drawRadius();
     setCenter();
+    $scope.stopSpin();
   }
 
   $scope.update               = function(){
@@ -205,5 +210,4 @@ app.controller('HomeController',
   reset();
   initMap();
   $scope.update();
-
 });

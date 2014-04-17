@@ -85,6 +85,11 @@
         </div>
       </div>
     </div>
+    <span 
+      spinner-key="spinner-1" 
+      spinner-start-active="1" 
+      us-spinner="{radius:50, width:8, length: 16}"></span>
+
   </div>
 
 </div>
@@ -93,8 +98,8 @@
 
 <div class='table-responsive' style='width:50%; height:{{ tableHeight }}px;
 overflow: auto; overflow-y:scroll;'>
-  <table class="table table-condensed" style='background-color:white; opacity:.9;-moz-border-radius: 30px 30px / 30px
-30px; border-radius: 30px 30px / 30px 30px;'>
+  <table class="table table-condensed" style='background-color:white; opacity:.9;-moz-border-radius: 2px 2px / 2px
+2px; border-radius: 2px 2px / 2px 2px;'>
     <tr  
       ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " >
       <td width='120px' ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
@@ -104,6 +109,7 @@ overflow: auto; overflow-y:scroll;'>
       <td  
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker()">
+
         <b style='color:#222'>{{ event.name | capitalize }}</b>
         <span ng-repeat="item in event.foodProvided"
           ng-click='event.showTags = !event.showTags'
