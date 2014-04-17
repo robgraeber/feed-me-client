@@ -1,4 +1,4 @@
-window.app = angular.module('feed-me', [ 'ngRoute', 'ngMap', 'angularMoment',]);
+window.app = angular.module('feed-me', [ 'ngRoute', 'ngMap', 'angularMoment', 'angularSpinner']);
 
 // CORS: SET-UP IN ANGULAR-JS
 // http://stackoverflow.com/questions/17756550/angularjs-cors-issues

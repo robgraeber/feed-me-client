@@ -4,10 +4,15 @@ app.controller('HomeController',
     $timeout, 
     $filter,
     $location,
+    $window,
     mapOptions, 
     tonight,
     tomorrow,
     weekdays,
+    highlightMarkerUri,
+    normalMarkerUri,
+    pinMarkerUri,
+    usSpinnerService,
     FeedmeService, 
     GeoapiService,
     GeolatlngService){
@@ -20,6 +25,10 @@ app.controller('HomeController',
   $scope.reverse    = false;
   $scope.timeframe  = 'today';
   $scope.isVisible  = function(event){return $filter('isVisible')(event, $scope)};
+  $scope.pageSize   = 10;
+  $scope.tableHeight= .5*$window.innerHeight;
+  $scope.hasEvents  = false;
+
   var tempAddress   = '';
   var filterAddressTimeout;
   moment.lang('en', weekdays);  
@@ -27,12 +36,40 @@ app.controller('HomeController',
   var mapOffset         = -0.10;
   var mapElement        = document.getElementById('map');
   var mapEvents         = [];
+  var mapLastInfoWindow = null;
   var mapRadius, mapCenter;
+  $scope.mapZoom        = mapOptions.default.zoom;
+  var rendererOptions = { draggable: true };
+  var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);;
+  var directionsService = new google.maps.DirectionsService();
+
+
+  $scope.isSpinning= true;
+  $scope.startSpin = function(){ 
+    if(!$scope.isSpinning){
+      usSpinnerService.spin('spinner-1');  
+      $scope.isSpinning
+    } 
+  }
+  $scope.stopSpin  = function(){ 
+    $timeout(function() { $scope.isSpinning = false; }, 5000);
+    usSpinnerService.stop('spinner-1'); 
+  }
+
+  computeTotalDistance = function(result) {
+    var total = 0;
+    var myroute = result.routes[0];
+    for (i = 0; i < myroute.legs.length; i++) {
+      total += myroute.legs[i].distance.value;
+    }
+    total = total / 1000.
+    document.getElementById("total").innerHTML = total + " km";
+  }
 
   initMap = function(){
     GeolatlngService().then(function(pos){
       center = new google.maps.LatLng(pos.latitude, pos.longitude + mapOffset);
-      var theme = $location.path() === '/' ? 'default' : $location.path();
+      var theme = $location.search().mapOption ? $location.search().mapOption : 'default';
       var mapTheme = mapOptions[theme.replace('/','')];
       mapTheme.center = center;
       mapTheme.zoomControlOptions = { 
@@ -40,6 +77,10 @@ app.controller('HomeController',
 	      position: google.maps.ControlPosition.RIGHT_CENTER };
       $scope.map.setCenter(mapTheme.center);
       $scope.map = new google.maps.Map(mapElement, mapTheme);
+      directionsDisplay.setMap($scope.map);
+      google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+        computeTotalDistance(directionsDisplay.directions);
+      });
       google.maps.event.addDomListener($scope.map, 'bounds_changed', function(){
         var bounds = $scope.map.getBounds();
         var ne = bounds.getNorthEast();
@@ -53,7 +94,9 @@ app.controller('HomeController',
           mapCenter.getPosition().lng()+mapOffset);
         $scope.map.setCenter($scope.offsetCenter); 
       });
-      google.maps.event.addDomListener(window, 'resize', function() { $scope.map.setCenter($scope.offsetCenter); });
+      google.maps.event.addDomListener(window, 'resize', function() { 
+          $scope.map.setCenter($scope.offsetCenter); 
+      });
       GeoapiService.getAddress(pos).then(function(address){
         $scope.address = address.data.results[0].formatted_address;
         $scope.filterMarkers();
@@ -70,7 +113,7 @@ app.controller('HomeController',
     mapOffset = difflng * .25 * (-1); 
     mapCenter && mapCenter.setMap(null);
     mapCenter && google.maps.event.clearListeners(mapCenter, "dragend");
-    var pinImage = new google.maps.MarkerImage("https://chart.googleapis.com/chart?chst=d_map_xpin_icon&chld=pin_star%7Chome%7Cb2182b%7CFFFFFF",
+    var pinImage = new google.maps.MarkerImage(pinMarkerUri,
       new google.maps.Size(21, 34),
       new google.maps.Point(0,0),
       new google.maps.Point(10, 34));
@@ -111,35 +154,63 @@ app.controller('HomeController',
     for (var i = 0; i < dat.length ; i++) {
       if($filter('isVisible')(dat[i], $scope)){
         venue = dat[i].venue.address;
-        mapEvents.push(new google.maps.Marker({ 'title': dat[i].title }));
+        mapEvents.push(new google.maps.Marker({ 'title': dat[i].title , }));
         id = mapEvents.length - 1;
         position = new google.maps.LatLng(venue.latitude, venue.longitude);
         mapEvents[id].setPosition(position);
         mapEvents[id].setMap($scope.map)
+        dat[i].map = mapEvents[id];
+        dat[i].highlightMarker = function(){ this.map.setIcon(highlightMarkerUri); };
+        dat[i].normalizeMarker = function(){ this.map.setIcon(null); };
+        dat[i].infoText = '<b><a href="'+dat[i].unique+'">'+dat[i].name+'</a></b><br><p><a href="'+dat[i].unique+'">'; 
+        dat[i].infoText += dat[i].description.length>143?dat[i].description.slice(0,143)+' ...':dat[i].description ;
+        dat[i].infoText += '</a><address><strong>@ '+dat[i].venue.name+'</strong> ';
+        dat[i].infoText += '<a href="'+dat[i].unique+'">'+dat[i].venue.address.address1+'</a>';
+        dat[i].infoText += ' - '+dat[i].venue.address.city;
+        dat[i].infoWindow = new google.maps.InfoWindow({ content:dat[i].infoText, maxWidth:300 });
+        dat[i].infoWindow.setPosition(dat[i].map.getPosition());
+        // http://stackoverflow.com/questions/7044587/adding-multiple-markers-with-infowindows-google-maps-api
+        google.maps.event.addListener(dat[i].map, 'click', function(event) {
+          return function() {
+            mapLastInfoWindow && mapLastInfoWindow.close();
+            mapLastInfoWindow = event.infoWindow;
+            event.infoWindow.open($scope.map, event.map);
+            request = {
+              origin: $scope.coord,
+              destination: event.map.getPosition(),
+              travelMode: google.maps.TravelMode.WALKING };
+            directionsService.route(request, function(response, status) {
+              if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+              }
+            });
+          }
+        }(dat[i]));
       } 
     }
     drawRadius();
     setCenter();
   }
 
-  $scope.update = function(){
-    FeedmeService.get($scope.filterAddress)
-    .then(function(res){ 
-      $scope.events = res.data.results; 
+  $scope.update               = function(){
+    $scope.startSpin();
+    FeedmeService.get($scope.filterAddress).then(function(res){ 
+      $scope.events           = res.data.results; 
       reset();
       var dat                 = $scope.events;
       for(var i = 0 ; i < dat.length ; i++){
         dat[i].showDescription= false;
         dat[i].showTags       = false;
-        dat[i].marker         = null;
+        dat[i].marker         =  null;
       }
       count();
       GeoapiService.getLatLng($scope.address).then(function(addr){
-        var pos = addr.data.results[0].geometry.location;
-        $scope.coord = new google.maps.LatLng(pos.lat, pos.lng);
-        $scope.offsetCenter = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
+        var pos               = addr.data.results[0].geometry.location;
+        $scope.coord          = new google.maps.LatLng(pos.lat, pos.lng            );
+        $scope.offsetCenter   = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
         $scope.map.setCenter($scope.offsetCenter);
         $scope.filterMarkers();
+        $scope.stopSpin();
       });
     });
   };
@@ -155,18 +226,25 @@ app.controller('HomeController',
 
   count = function(){
     var dat = $scope.events; 
+    $scope.count = {
+      'today'   :{'LT1':0,'LT3':0,'LT5':0},
+      'tomorrow':{'LT1':0,'LT3':0,'LT5':0},
+      'thisweek':{'LT1':0,'LT3':0,'LT5':0}};
     for(var i = 0 ; i < dat.length ; i++){
       var itime               = new Date(dat[i].time);
-      $scope.countLT1         += dat[i].distance < 1 ? 1 : 0;
-      $scope.countLT3         += dat[i].distance < 3 ? 1 : 0;
-      $scope.countLT5         += dat[i].distance < 5 ? 1 : 0;
-      $scope.countToday       += itime <  tonight ? 1 : 0;
-      $scope.countTomorrow    += itime >= tonight && itime < tomorrow ? 1 : 0;
-      $scope.countThisWeek    += itime >= tomorrow ? 1 : 0;
-      dat[i].timeFMT          = moment(new Date(dat[i].time)).calendar();
+      if(itime <  tonight  &&                      dat[i].distance < 1) $scope.count.today.LT1++;
+      if(itime <  tonight  &&                      dat[i].distance < 3) $scope.count.today.LT3++;
+      if(itime <  tonight  &&                      dat[i].distance < 5) $scope.count.today.LT5++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 1) $scope.count.tomorrow.LT1++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 3) $scope.count.tomorrow.LT3++;
+      if(itime >= tonight  && itime <  tomorrow && dat[i].distance < 5) $scope.count.tomorrow.LT5++;
+      if(                     itime >= tomorrow && dat[i].distance < 1) $scope.count.thisweek.LT1++;
+      if(                     itime >= tomorrow && dat[i].distance < 3) $scope.count.thisweek.LT3++;
+      if(                     itime >= tomorrow && dat[i].distance < 5) $scope.count.thisweek.LT5++;
+      dat[i].timeFMT = moment(new Date(dat[i].time)).calendar();
       dat[i].timeFMT = dat[i].timeFMT.replace(/(Today at )|(Tomorrow at )/,'');
     }
-  }
+  };
 
   reset                = function(){
     $scope.countLT1    = $scope.countLT3      = $scope.countLT5      = 0;
