@@ -27,6 +27,7 @@ app.controller('HomeController',
   $scope.isVisible  = function(event){return $filter('isVisible')(event, $scope)};
   $scope.pageSize   = 10;
   $scope.tableHeight= .5*$window.innerHeight;
+  $scope.hasEvents  = false;
 
   var tempAddress   = '';
   var filterAddressTimeout;
@@ -37,9 +38,16 @@ app.controller('HomeController',
   var mapEvents         = [];
   var mapLastInfoWindow = null;
   var mapRadius, mapCenter;
+  $scope.mapZoom        = mapOptions.default.zoom;
 
-  $scope.startSpin = function(){ usSpinnerService.spin('spinner-1'); }
-  $scope.stopSpin  = function(){ usSpinnerService.stop('spinner-1'); }
+  $scope.isSpinning= true;
+  $scope.startSpin = function(){ 
+    if(!$scope.isSpinning){
+      usSpinnerService.spin('spinner-1');  
+      $scope.isSpinning
+    } 
+  }
+  $scope.stopSpin  = function(){ $scope.isSpinning = false; usSpinnerService.stop('spinner-1'); }
 
   initMap = function(){
     GeolatlngService().then(function(pos){
@@ -125,7 +133,7 @@ app.controller('HomeController',
     for (var i = 0; i < dat.length ; i++) {
       if($filter('isVisible')(dat[i], $scope)){
         venue = dat[i].venue.address;
-        mapEvents.push(new google.maps.Marker({ 'title': dat[i].title }));
+        mapEvents.push(new google.maps.Marker({ 'title': dat[i].title , }));
         id = mapEvents.length - 1;
         position = new google.maps.LatLng(venue.latitude, venue.longitude);
         mapEvents[id].setPosition(position);
@@ -133,7 +141,12 @@ app.controller('HomeController',
         dat[i].map = mapEvents[id];
         dat[i].highlightMarker = function(){ this.map.setIcon(highlightMarkerUri); };
         dat[i].normalizeMarker = function(){ this.map.setIcon(null); };
-        dat[i].infoWindow = new google.maps.InfoWindow({content: dat[i].name});
+        dat[i].infoText = '<b><a href="'+dat[i].unique+'">'+dat[i].name+'</a></b><br><p><a href="'+dat[i].unique+'">'; 
+        dat[i].infoText += dat[i].description.length>143?dat[i].description.slice(0,143)+' ...':dat[i].description ;
+        dat[i].infoText += '</a><address><strong>@ '+dat[i].venue.name+'</strong><br>';
+        dat[i].infoText += '<a href="'+dat[i].unique+'">'+dat[i].venue.address.address1+'</a>';
+        dat[i].infoText += ' - '+dat[i].venue.address.city;
+        dat[i].infoWindow = new google.maps.InfoWindow({ content:dat[i].infoText, maxWidth:300 });
         dat[i].infoWindow.setPosition(dat[i].map.getPosition());
         // http://stackoverflow.com/questions/7044587/adding-multiple-markers-with-infowindows-google-maps-api
         google.maps.event.addListener(dat[i].map, 'click', function(event) {
@@ -147,10 +160,10 @@ app.controller('HomeController',
     }
     drawRadius();
     setCenter();
-    $scope.stopSpin();
   }
 
   $scope.update               = function(){
+    $scope.startSpin();
     FeedmeService.get($scope.filterAddress).then(function(res){ 
       $scope.events           = res.data.results; 
       reset();
@@ -167,6 +180,7 @@ app.controller('HomeController',
         $scope.offsetCenter   = new google.maps.LatLng(pos.lat, pos.lng + mapOffset);
         $scope.map.setCenter($scope.offsetCenter);
         $scope.filterMarkers();
+        $scope.stopSpin();
       });
     });
   };

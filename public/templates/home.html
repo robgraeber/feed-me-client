@@ -1,6 +1,15 @@
 <h1>Food Bot</h1>
 
-<map id='map'></map>
+<div ng-class="{withfadeout:isSpinning, withfadein:!isSpinning}">
+  <map  zoom='{{mapZoom}}' id='map'></map>
+</div>
+
+
+  <span 
+    style='z-index:100'
+    spinner-key="spinner-1" 
+    spinner-start-active="1" 
+    us-spinner="{radius:200, width:30, length: 56}"></span>
 
 <div class='row' >
 
@@ -85,10 +94,6 @@
         </div>
       </div>
     </div>
-    <span 
-      spinner-key="spinner-1" 
-      spinner-start-active="1" 
-      us-spinner="{radius:50, width:8, length: 16}"></span>
 
   </div>
 
@@ -96,11 +101,13 @@
 
 <div style="height:20px" class="ng-scope"></div>
 
+
 <div class='table-responsive' style='width:50%; height:{{ tableHeight }}px;
-overflow: auto; overflow-y:scroll;'>
-  <table class="table table-condensed" style='background-color:white; opacity:.9;-moz-border-radius: 2px 2px / 2px
-2px; border-radius: 2px 2px / 2px 2px;'>
-    <tr  
+overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBBBB; border-top-width:1px'>
+
+  <table class="table table-condensed table-hover" style='background-color:white; opacity:.9;-moz-border-radius: 4px 4px / 4px
+4px; border-radius: 4px 4px / 4px 4px; border-style:solid; border-color:#BBBBBB; border-width:1px;'>
+    <tr style='border-top-style:solid; border-top-color:#BBBBBB; border-top-width:1px' 
       ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " >
       <td width='120px' ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
