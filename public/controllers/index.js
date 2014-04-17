@@ -162,15 +162,7 @@ app.controller('HomeController',
             mapLastInfoWindow && mapLastInfoWindow.close();
             mapLastInfoWindow = event.infoWindow;
             event.infoWindow.open($scope.map, event.map);
-            request = {
-              origin: $scope.coord,
-              destination: event.map.getPosition(),
-              travelMode: google.maps.TravelMode.WALKING };
-            directionsService.route(request, function(response, status) {
-              if (status == google.maps.DirectionsStatus.OK) {
-                directionsDisplay.setDirections(response);
-              }
-            });
+            $scope.showRoute(event);
           }
         }(dat[i]));
       } 
@@ -178,6 +170,18 @@ app.controller('HomeController',
     drawRadius();
     setCenter();
   }
+
+  $scope.showRoute            = function(event){
+    request = {
+      origin: $scope.coord,
+      destination: event.map.getPosition(),
+      travelMode: google.maps.TravelMode.WALKING };
+    directionsService.route(request, function(response, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        directionsDisplay.setDirections(response);
+      }
+    });
+  };
 
   $scope.update               = function(){
     $scope.startSpin();

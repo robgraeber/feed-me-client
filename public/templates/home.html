@@ -108,11 +108,14 @@ overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBB
 4px; border-radius: 4px 4px / 4px 4px; border-style:solid; border-color:#BBBBBB; border-width:1px;'>
     <tr style='border-top-style:solid; border-top-color:#BBBBBB; border-top-width:1px' 
       ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " >
-      <td width='120px' ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
+      <td width='120px' 
+        ng-click='showRoute(event)'
+        ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
       </td>
 
       <td  
+        ng-click='showRoute(event)'
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker()">
 
@@ -150,6 +153,7 @@ overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBB
       </td>
 
       <td width='100px' 
+        ng-click='showRoute(event)'
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>
