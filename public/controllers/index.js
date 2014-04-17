@@ -143,7 +143,7 @@ app.controller('HomeController',
         dat[i].normalizeMarker = function(){ this.map.setIcon(null); };
         dat[i].infoText = '<b><a href="'+dat[i].unique+'">'+dat[i].name+'</a></b><br><p><a href="'+dat[i].unique+'">'; 
         dat[i].infoText += dat[i].description.length>143?dat[i].description.slice(0,143)+' ...':dat[i].description ;
-        dat[i].infoText += '</a><address><strong>@ '+dat[i].venue.name+'</strong><br>';
+        dat[i].infoText += '</a><address><strong>@ '+dat[i].venue.name+'</strong> ';
         dat[i].infoText += '<a href="'+dat[i].unique+'">'+dat[i].venue.address.address1+'</a>';
         dat[i].infoText += ' - '+dat[i].venue.address.city;
         dat[i].infoWindow = new google.maps.InfoWindow({ content:dat[i].infoText, maxWidth:300 });

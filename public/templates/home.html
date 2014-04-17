@@ -7,6 +7,8 @@
 
   <span 
     style='z-index:100'
+    ng-class="{withfadeout:!isSpinning, withfadein:isSpinning}"
+
     spinner-key="spinner-1" 
     spinner-start-active="1" 
     us-spinner="{radius:200, width:30, length: 56}"></span>
@@ -156,8 +158,6 @@ overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBB
         <span style='color:#888'>
           At {{ event.distance | number:1 }} mi. 
         </span>
-        <a class='glyphicon glyphicon-link' 
-          href="{{event.unique}}" style='float:right;margin:2px'/>
       </td>
     </tr>
   </table>
