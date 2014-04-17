@@ -81,19 +81,6 @@ app.controller('HomeController',
       google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
         computeTotalDistance(directionsDisplay.directions);
       });
-      google.maps.event.addDomListener($scope.map, 'bounds_changed', function(){
-        var bounds = $scope.map.getBounds();
-        var ne = bounds.getNorthEast();
-        var sw = bounds.getSouthWest();
-        var difflat = Math.abs(ne.lat()-sw.lat());
-        var difflng = Math.abs(ne.lng()-sw.lng());
-        mapOffset = difflng * .25 * (-1); 
-        $scope.coord = mapCenter.getPosition();
-        $scope.offsetCenter = new google.maps.LatLng(
-          mapCenter.getPosition().lat(),
-          mapCenter.getPosition().lng()+mapOffset);
-        $scope.map.setCenter($scope.offsetCenter); 
-      });
       google.maps.event.addDomListener(window, 'resize', function() { 
           $scope.map.setCenter($scope.offsetCenter); 
       });
