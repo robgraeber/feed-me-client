@@ -39,6 +39,10 @@ app.controller('HomeController',
   var mapLastInfoWindow = null;
   var mapRadius, mapCenter;
   $scope.mapZoom        = mapOptions.default.zoom;
+  var rendererOptions = { draggable: true };
+  var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);;
+  var directionsService = new google.maps.DirectionsService();
+
 
   $scope.isSpinning= true;
   $scope.startSpin = function(){ 
@@ -47,7 +51,20 @@ app.controller('HomeController',
       $scope.isSpinning
     } 
   }
-  $scope.stopSpin  = function(){ $scope.isSpinning = false; usSpinnerService.stop('spinner-1'); }
+  $scope.stopSpin  = function(){ 
+    $timeout(function() { $scope.isSpinning = false; }, 5000);
+    usSpinnerService.stop('spinner-1'); 
+  }
+
+  computeTotalDistance = function(result) {
+    var total = 0;
+    var myroute = result.routes[0];
+    for (i = 0; i < myroute.legs.length; i++) {
+      total += myroute.legs[i].distance.value;
+    }
+    total = total / 1000.
+    document.getElementById("total").innerHTML = total + " km";
+  }
 
   initMap = function(){
     GeolatlngService().then(function(pos){
@@ -60,6 +77,10 @@ app.controller('HomeController',
 	      position: google.maps.ControlPosition.RIGHT_CENTER };
       $scope.map.setCenter(mapTheme.center);
       $scope.map = new google.maps.Map(mapElement, mapTheme);
+      directionsDisplay.setMap($scope.map);
+      google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+        computeTotalDistance(directionsDisplay.directions);
+      });
       google.maps.event.addDomListener($scope.map, 'bounds_changed', function(){
         var bounds = $scope.map.getBounds();
         var ne = bounds.getNorthEast();
@@ -154,6 +175,15 @@ app.controller('HomeController',
             mapLastInfoWindow && mapLastInfoWindow.close();
             mapLastInfoWindow = event.infoWindow;
             event.infoWindow.open($scope.map, event.map);
+            request = {
+              origin: $scope.coord,
+              destination: event.map.getPosition(),
+              travelMode: google.maps.TravelMode.WALKING };
+            directionsService.route(request, function(response, status) {
+              if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+              }
+            });
           }
         }(dat[i]));
       } 
