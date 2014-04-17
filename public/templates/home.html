@@ -96,12 +96,8 @@ overflow: auto; overflow-y:scroll;'>
   <table class="table table-condensed" style='background-color:white; opacity:.9;-moz-border-radius: 30px 30px / 30px
 30px; border-radius: 30px 30px / 30px 30px;'>
     <tr  
-      ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " 
-      infinite-scroll="myPagingFunction()" 
-      infinite-scroll-distance="3">
-      <td width='120px' 
-        ng-mouseover="event.highlightMarker();"
-        ng-mouseout="event.normalizeMarker();">
+      ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " >
+      <td width='120px' ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
       </td>
 
