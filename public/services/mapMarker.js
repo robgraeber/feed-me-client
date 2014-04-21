@@ -14,13 +14,13 @@ app.service('MapMarkerService',
     return storage.length;        
   };
 
-  this.close = function(){ 
+  this.closeWindow = function(){ 
     this.lastInfo && this.lastInfo.close(); 
   };
   
   this.onClick = function(marker){
     this.lastInfo = marker.infoWindow;
-    this.lastInfo.open(this.map, marker);
+    this.lastInfo.open(marker.getMap(), marker);
   };
   
   this.mixin = function(event, map){ 
@@ -49,7 +49,7 @@ app.service('MapMarkerService',
           MapCenterService, 
           MapRouteService) {
       return function() {
-        MapMarkerService.close();
+        MapMarkerService.closeWindow();
         MapMarkerService.onClick(event.marker);
         MapRouteService.get(MapCenterService.get(), event.marker.getPosition());
         MapCenterService.set(event.marker.getPosition());
