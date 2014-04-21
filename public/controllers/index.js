@@ -10,8 +10,7 @@ app.controller('HomeController',
     SpinnerService,
     CountService,
     TimeService,
-    FeedmeService, 
-    GeoapiService){
+    FeedmeService){
   $scope.address    = 'San Francisco';
   $scope.predicate  = 'time';
   $scope.reverse    = false;
@@ -65,7 +64,9 @@ app.controller('HomeController',
       tempAddress = val;
       filterAddressTimeout      = $timeout(function() {
         $scope.filterAddressTimeout = tempAddress;
-        $scope.update();
+        MapService.set($scope.filterAddressTimeout).then(function(){
+          $scope.update();
+        });
       }, 800);
     });
   });

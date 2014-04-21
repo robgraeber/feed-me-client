@@ -28,16 +28,19 @@ app.service('MapService', [
   this.getCenter      = function(){ return MapCenterService.get();};
 
   this.set            = function(anAddress){
-    return GeoapiService.getLatLng(anAddress).then(function(addr){
-      var pos = addr.data.results[0].geometry.location;
-      MapCenterService.set(new google.maps.LatLng(pos.lat, pos.lng));
-    });
+    return GeoapiService.getLatLng(anAddress).then(function(MapService){
+      return function(addr){
+        var loc = addr.data.results[0].geometry.location;
+        var pos = {latitude:loc.lat, longitude:loc.lng};
+        MapCenterService.init(pos, MapService.scope, MapService.get());
+        MapService.setRadius();
+      }
+    }(this));
   };
 
   this.getRadius      = function(){ return radius };
 
   this.setRadius      = function(){
-    console.log('@MapService.setRadius', radius);
     radius && radius.setMap(null);
     radius = new google.maps.Circle({
       'strokeColor'   : '#b2182b',
@@ -70,7 +73,7 @@ app.service('MapService', [
     }(this));
     return GeoapiService.init().then(function(position){
       var point = new google.maps.LatLng(position.latitude, position.longitude);
-      MapCenterService.init(scope, position, scope.mapWrapper);
+      MapCenterService.init(position, scope, scope.mapWrapper);
       MapRouteService.init(scope.mapWrapper);
       // ON WINDOW RESIZE, AUTO RE-CENTER THE MAP
       google.maps.event.addDomListener(window, 'resize', function(event) {
