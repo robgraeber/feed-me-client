@@ -1,13 +1,13 @@
-app.filter('time', function(tonight, tomorrow){
+app.filter('time', ['TimeService', function(TimeService){
   return function(event, scope) {
     var aTime = new Date(event.time);
     if(scope.timeframe === "today"){
-      return aTime < tonight;
+      return aTime < TimeService.tonight();
     } else if(scope.timeframe === "tomorrow"){
-      return aTime >= tonight && aTime < tomorrow;
+      return aTime >= TimeService.tonight() && aTime < TimeService.tomorrow();
     } else if(scope.timeframe === "later"){
-      return aTime >= tomorrow ;
+      return aTime >= TimeService.tomorrow() ;
     } 
     return true;
   }
-});
+}]);
