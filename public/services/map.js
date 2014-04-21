@@ -1,4 +1,5 @@
 app.service('MapService', [
+    '$rootScope',
     '$filter',
     'GeoapiService',
     'MapCenterService',
@@ -8,7 +9,9 @@ app.service('MapService', [
     'normalMarkerUri',
     'pinMarkerUri',
     'mapOptions', 
-    function($filter,
+    function(
+      $rootScope,
+      $filter,
       GeoapiService, 
       MapCenterService, 
       MapRouteService, 
@@ -34,6 +37,7 @@ app.service('MapService', [
   this.getRadius      = function(){ return radius };
 
   this.setRadius      = function(){
+    console.log('@MapService.setRadius', radius);
     radius && radius.setMap(null);
     radius = new google.maps.Circle({
       'strokeColor'   : '#b2182b',
@@ -41,10 +45,11 @@ app.service('MapService', [
       'strokeWeight'  : 4,
       'fillColor'     : '#b2182b',
       'fillOpacity'   : 0.0,
-      'map'           : map,
+      'map'           : this.mapWrapper,
       'center'        : MapCenterService.get(),
       'radius'        : MapCenterService.getRadius() * 1.624 * 1000  
     });
+
   };
 
   this.update           = function(events){
@@ -60,6 +65,9 @@ app.service('MapService', [
     this.scope        = scope;
     this.mapWrapper = scope.mapWrapper = new google.maps.Map(map, mapOptions.default);
     this.address      = scope.address;
+    $rootScope.$on('dragend:home', function(MapService){
+      return function(event){ MapService.setRadius()}
+    }(this));
     return GeoapiService.init().then(function(position){
       var point = new google.maps.LatLng(position.latitude, position.longitude);
       MapCenterService.init(scope, position, scope.mapWrapper);

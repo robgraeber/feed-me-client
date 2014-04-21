@@ -1,6 +1,6 @@
 app.service('MapCenterService',
-    ['pinMarkerUri',
-    function(pinMarkerUri){
+    [ '$rootScope', 'pinMarkerUri',
+    function($rootScope, pinMarkerUri){
   var radius = 5 ; // in miles
   this.center = null;
   this.home = null;
@@ -31,14 +31,16 @@ app.service('MapCenterService',
       'icon': pinImage
     });
     this.set(this.home.getPosition());
-    google.maps.event.addListener(this.home, "dragend", function(MapCenterService){
+    google.maps.event.addListener(this.home, "dragend", function(MapCenterService, $scope){
       return function(event) { 
         var position = new google.maps.LatLng(event.latLng.lat(), event.latLng.lng());
         MapCenterService.scope.address = position.lat()+','+position.lng();
         MapCenterService.set(position);
         MapCenterService.scope.update();
+        debugger;
+        scope.$emit('dragend:home');
       }
-    }(this));
+    }(this, scope));
   };
 
   this.set  = function(pos){

@@ -15,7 +15,6 @@ app.filter('radius', ['MapCenterService',function(MapCenterService){
   return function(event){
     var result = mapDistance(event);
     var radius = MapCenterService.getRadius();
-    console.log('@filter.radius:',result,result<radius);
     return  result < radius ; 
   };
 }]);

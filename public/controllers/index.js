@@ -48,6 +48,7 @@ app.controller('HomeController',
     $scope.update();
     $scope.$watch('radius', function(val){
       MapCenterService.setRadius(val);
+      MapService.setRadius();
       $scope.update();
     });
     $scope.$watch('timeframe', function(val){
