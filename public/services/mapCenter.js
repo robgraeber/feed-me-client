@@ -37,10 +37,14 @@ app.service('MapCenterService',
         MapCenterService.scope.address = position.lat()+','+position.lng();
         MapCenterService.set(position);
         MapCenterService.scope.update();
-        debugger;
         scope.$emit('dragend:home');
       }
     }(this, scope));
+    google.maps.event.addListener(map, 'zoom_changed', function(MapCenterService) {
+      return function(event){
+        MapCenterService.set(MapCenterService.get())
+      }
+    }(this));
   };
 
   this.set  = function(pos){
