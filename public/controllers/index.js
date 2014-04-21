@@ -18,9 +18,11 @@ app.controller('HomeController',
   $scope.timeframe  = 'today';
   $scope.isVisible  = function(event){return $filter('isVisible')(event, $scope)};
   $scope.radius     = 5;
-  $scope.tableHeight= .5*$window.innerHeight;
+  $scope.tableHeight= .7*$window.innerHeight;
   $scope.hasEvents  = false;
-  $scope.showRoute  = MapRouteService.get;
+  $scope.showRoute  = function(event){
+    MapRouteService.get(MapCenterService.get(), event.marker.getPosition());
+  };
 
   // DELAY ON SEARCH BOX 
   var tempAddress   = '';
@@ -37,8 +39,8 @@ app.controller('HomeController',
         $scope.events[i].showTags       = false ;
         $scope.events[i].marker         = null  ;
         $scope.events[i].timeFMT        = TimeService.format($scope.events[i]);
-        if($scope.events[i].description.length > 143){
-          $scope.events[i].text = $scope.events[i].description.slice(0,143)+' ...';
+        if($scope.events[i].description.length > 283){
+          $scope.events[i].text = $scope.events[i].description.slice(0,283)+' ...';
         } else {
           $scope.events[i].text = $scope.events[i].description;
         }
