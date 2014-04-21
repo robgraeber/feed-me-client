@@ -81,28 +81,6 @@
       </div>
     </div>
 
-    <div class="input-group">
-      <span class="input-group-addon">
-        <div class='glyphicon glyphicon-sort-by-attributes'/>
-      </span>
-      <div class="btn-group btn-group-justified">
-        <div class="btn-group" data-toggle="buttons">
-          <button type="button" class="btn btn-default" 
-            ng-class="{active: predicate == 'time'}"
-            ng-click='predicate = "time"'>
-            Time 
-          </button>
-        </div>
-        <div class="btn-group" data-toggle="buttons">
-          <button type="button" class="btn btn-default" 
-            ng-class="{active: predicate == 'distance'}"
-            ng-click='predicate = "distance"'>
-            Distance 
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
 </div>
@@ -115,32 +93,53 @@ overflow: auto; overflow-y:scroll;margin:0px;padding:0px'>
 
   <table class="table table-condensed table-hover" style='background-color:white;table-layout: fixed;border:grey;border-width:1px;'>
     <tr>
-      <th width='20%'>When</th>
+      <th width='20%'>
+        <button width='100%' type="button" class="btn btn-sm" 
+          ng-class="{active: predicate == 'time'}"
+          ng-click='predicate = "time"'>
+          <div class='glyphicon glyphicon-time'/></span>
+          <div class='glyphicon glyphicon-sort-by-attributes'/>
+        </button>
+      </th>
       <th width='52%'>Event</th>
-      <th width='10%'>Dist.</th>
-      <th width='7.5%'>Route</th>
-      <th width='9.5%'>Www</th>
+      <th width='10%'>
+        <button type="button" class="btn btn-sm" 
+          ng-class="{active: predicate == 'distance'}"
+          ng-click='predicate = "distance"'>
+          <div class='glyphicon glyphicon-hand-right'/></span>
+          <div class='glyphicon glyphicon-sort-by-attributes'/>
+        </button>
+      </th>
+      <th width='7.5%'>Www</th>
+      <th width='9.5%'>Route</th>
     </tr>
   
     <tr style='border-top-style:solid; border-top-color:#BBBBBB; border-top-width:1px' 
       ng-repeat="event in events | filter:isVisible | orderBy: predicate: reverse " >
       <td width='120px' 
-        ng-click='showRoute(event)'
         ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
 
-        <span class='glyphicon glyphicon-resize-small'
-          style='float:right;opacity:.5'
+        <button 
+          type="button" 
+          class="btn btn-sm" 
+          style='float:right'
           ng-show="event.showDescription " 
-          ng-click="event.showDescription = !event.showDescription" />
-        <span class='glyphicon glyphicon-resize-full' 
-          style='float:right;opacity:.5'
+          ng-click="event.showDescription = !event.showDescription"> 
+          <span class='glyphicon glyphicon-resize-small'/>
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-sm" 
+          style='float:right' 
           ng-show="!event.showDescription " 
-          ng-click="event.showDescription = !event.showDescription" />
+          ng-click="event.showDescription = !event.showDescription" >
+          <span class='glyphicon glyphicon-resize-full'/>
+        </button>
       </td>
 
       <td  
-        ng-click='showRoute(event)'
+        ng-click="event.showDescription = !event.showDescription" 
         ng-mouseover="event.highlightMarker();"
         ng-mouseout="event.normalizeMarker()"
         onmouseover="" style="cursor: pointer;">
@@ -181,7 +180,7 @@ overflow: auto; overflow-y:scroll;margin:0px;padding:0px'>
       </td>
       <td>
         <button type="button" class="btn btn-sm"> 
-          <a href='{{event.unique}}'>
+          <a href='{{event.unique}}' target='_blank'>
             <span class='glyphicon glyphicon-link' style='height:20px;'></span>
           </a>
         </button>

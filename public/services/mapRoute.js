@@ -1,6 +1,7 @@
 app.service('MapRouteService', [
+    '$rootScope',
     'MapCenterService',
-    function(MapCenterService){
+    function($rootScope, MapCenterService){
 
   var dest = null;
 
@@ -24,6 +25,7 @@ app.service('MapRouteService', [
         return function() { MapCenterService.set(MapRouteService.getDestination()); };
       }(MapCenterService, this)
     );
+
   };
 
   this.get = function(orig, dest){
@@ -40,5 +42,12 @@ app.service('MapRouteService', [
         }
       }
     }(this));
+    $rootScope.$on('dragend:home', function(MapRouteService){
+      return function(event){ 
+        debugger;
+        MapRouteService.directionsDisplay.setMap(null);
+      }
+    }(this));
+
   }
 }]);
