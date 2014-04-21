@@ -15,7 +15,8 @@ app.service('MapCenterService',
 
   this.setRadius = function(val){ radius = val; }
 
-  this.init = function(scope, position, map){
+  this.init = function(position, scope, map){
+    this.home && this.home.setMap(null);
     this.scope = scope;
     this.center && this.center.setMap(null);
     this.center && google.maps.event.clearListeners(this.center, "dragend");
@@ -30,6 +31,7 @@ app.service('MapCenterService',
       'position': new google.maps.LatLng(position.latitude, position.longitude), 
       'icon': pinImage
     });
+    if(!this.home.getPosition) debugger;
     this.set(this.home.getPosition());
     google.maps.event.addListener(this.home, "dragend", function(MapCenterService, $scope){
       return function(event) { 
