@@ -21,14 +21,15 @@ app.controller('HomeController',
   $scope.tableHeight= .5*$window.innerHeight;
   $scope.hasEvents  = false;
 
-  // var tempAddress   = '';
-  // var filterAddressTimeout;
+  // DELAY ON SEARCH BOX 
+  var tempAddress   = '';
+  $scope.filterAddressTimeout;
   $scope.getCount   = CountService.get;
 
   $scope.update               = function(){
     SpinnerService.start();
     // FeedmeService.get($scope.filterAddress).then(function(res){ 
-    FeedmeService.get($scope.address).then(function(res){ 
+    FeedmeService.get($scope.filterAddressTimeout).then(function(res){ 
       $scope.events           = res.data.results; 
       for(var i = 0 ; i < $scope.events.length ; i++){
         $scope.events[i].showDescription= false ;
@@ -41,7 +42,7 @@ app.controller('HomeController',
           $scope.events[i].text = $scope.events[i].description;
         }
       }
-      CountService.update($scope.events);
+      CountService.update($scope.events);   
       return MapService.update($scope.events);
     }).then(function(){
       SpinnerService.stop();
@@ -59,14 +60,13 @@ app.controller('HomeController',
     $scope.$watch('timeframe', function(val){
       $scope.update();
     });
-//    $scope.$watch('address', function(val){
-//      debugger;
-//      if(filterAddressTimeout) $timeout.cancel(filterAddressTimeout);
-//      tempAddress = val;
-//      filterAddressTimeout      = $timeout(function() {
-//        $scope.filterAddress    = tempAddress;
-//        $scope.update();
-//      }, 800);
-//    });
+    $scope.$watch('address', function(val){
+      if($scope.filterAddressTimeout) $timeout.cancel($scope.filterAddressTimeout);
+      tempAddress = val;
+      filterAddressTimeout      = $timeout(function() {
+        $scope.filterAddressTimeout = tempAddress;
+        $scope.update();
+      }, 800);
+    });
   });
 });
