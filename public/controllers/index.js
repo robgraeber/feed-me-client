@@ -7,6 +7,7 @@ app.controller('HomeController',
     $window,
     MapService,
     MapCenterService,
+    MapRouteService,
     SpinnerService,
     CountService,
     TimeService,
@@ -19,6 +20,7 @@ app.controller('HomeController',
   $scope.radius     = 5;
   $scope.tableHeight= .5*$window.innerHeight;
   $scope.hasEvents  = false;
+  $scope.showRoute  = MapRouteService.get;
 
   // DELAY ON SEARCH BOX 
   var tempAddress   = '';
