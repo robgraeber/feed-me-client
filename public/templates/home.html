@@ -121,6 +121,15 @@ overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBB
         ng-click='showRoute(event)'
         ng-mouseover="event.highlightMarker();" ng-mouseout="event.normalizeMarker();">
         <span style='color:#888'>{{ event.timeFMT | capitalize }}</span>
+
+        <span class='glyphicon glyphicon-resize-small'
+          style='float:right;opacity:.5'
+          ng-show="event.showDescription " 
+          ng-click="event.showDescription = !event.showDescription" />
+        <span class='glyphicon glyphicon-resize-full' 
+          style='float:right;opacity:.5'
+          ng-show="!event.showDescription " 
+          ng-click="event.showDescription = !event.showDescription" />
       </td>
 
       <td  
@@ -129,6 +138,7 @@ overflow: auto; overflow-y:scroll;border-top-style:solid; border-top-color:#BBBB
         ng-mouseout="event.normalizeMarker()">
 
         <b style='color:#222'>{{ event.name | capitalize }}</b>
+         <p style='color:#444;line-height:1.5' class='text-justify' ng-show='event.showDescription'> {{event.text}} </p>
         <span ng-repeat="item in event.foodProvided"
           ng-click='event.showTags = !event.showTags'
           ng-show="!event.showTags">

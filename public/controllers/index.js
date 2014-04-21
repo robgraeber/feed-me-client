@@ -35,6 +35,11 @@ app.controller('HomeController',
         $scope.events[i].showTags       = false ;
         $scope.events[i].marker         = null  ;
         $scope.events[i].timeFMT        = TimeService.format($scope.events[i]);
+        if($scope.events[i].description.length > 143){
+          $scope.events[i].text = $scope.events[i].description.slice(0,143)+' ...';
+        } else {
+          $scope.events[i].text = $scope.events[i].description;
+        }
       }
       CountService.update($scope.events);
       return MapService.update($scope.events);
